@@ -1,33 +1,18 @@
 const express = require('express');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files
-app.use(express.static(path.join(__dirname)));
-
-// Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/daftar-janji.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'daftar-janji.html'));
-});
-
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
-});
 
 // API Routes
 app.get('/api/appointments', (req, res) => {
     try {
-        const data = fs.readFileSync(path.join(__dirname, 'data', 'appointments.json'), 'utf8');
+        const filePath = path.join('/tmp', 'appointments.json');
+        if (!fs.existsSync(filePath)) return res.json([]);
+        const data = fs.readFileSync(filePath, 'utf8');
         res.json(JSON.parse(data));
     } catch (e) {
         res.json([]);
@@ -36,10 +21,7 @@ app.get('/api/appointments', (req, res) => {
 
 app.post('/api/appointments', (req, res) => {
     try {
-        const dataDir = path.join(__dirname, 'data');
-        if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-        
-        const filePath = path.join(dataDir, 'appointments.json');
+        const filePath = path.join('/tmp', 'appointments.json');
         let appointments = [];
         
         if (fs.existsSync(filePath)) {
@@ -64,8 +46,7 @@ app.post('/api/appointments', (req, res) => {
 
 app.get('/api/stats', (req, res) => {
     try {
-        const dataDir = path.join(__dirname, 'data');
-        const filePath = path.join(dataDir, 'appointments.json');
+        const filePath = path.join('/tmp', 'appointments.json');
         let appointments = [];
         
         if (fs.existsSync(filePath)) {
@@ -98,10 +79,8 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
-// Export untuk Vercel
 module.exports = app;
 
-// Jalankan server jika di lokal
 if (require.main === module) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
