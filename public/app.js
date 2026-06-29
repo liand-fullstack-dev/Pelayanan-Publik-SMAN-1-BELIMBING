@@ -7,7 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_BASE_URL:'/api',
+    API_BASE_URL: '/api',
     MAX_FILE_SIZE: 5 * 1024 * 1024,
     ALLOWED_FILE_TYPES: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
     MAX_KEPERLUAN_LENGTH: 500,
@@ -15,6 +15,7 @@ const CONFIG = {
     TOAST_DURATION: 5000,
     ANIMATION_DURATION: 300
 };
+
 
 // ============================================
 // STATE MANAGEMENT
