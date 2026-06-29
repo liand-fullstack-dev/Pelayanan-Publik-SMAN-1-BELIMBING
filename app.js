@@ -7,9 +7,7 @@
 // CONFIGURATION
 // ============================================
 const CONFIG = {
-    API_BASE_URL: window.location.origin.includes('localhost') 
-        ? 'http://localhost:3000/api' 
-        : '/api',
+    API_BASE_URL:'/api',
     MAX_FILE_SIZE: 5 * 1024 * 1024,
     ALLOWED_FILE_TYPES: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
     MAX_KEPERLUAN_LENGTH: 500,
