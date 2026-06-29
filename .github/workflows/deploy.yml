@@ -1,33 +1,14 @@
-name: Deploy Backend
+#!/bin/bash
+set -e
 
-on:
-  push:
-    branches:
-      - main
-      - master
+echo "Deploying Edge Functions..."
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+supabase link \
+  --project-ref "$SUPABASE_PROJECT_ID" \
+  --password "$SUPABASE_DB_PASSWORD"
 
-    env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+supabase functions deploy appointments
+supabase functions deploy stats
+supabase functions deploy admin-auth
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Login to Supabase
-        run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
-
-      - name: Deploy Backend
-        run: |
-          chmod +x deploy.sh
-          ./deploy.sh
+echo "Done!"
