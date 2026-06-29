@@ -1,9 +1,7 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/admin", "destination": "/public/admin.html" },
-    { "source": "/daftar-janji", "destination": "/public/daftar-janji.html" },
-    { "source": "/", "destination": "/public/index.html" }
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/daftar-janji", "destination": "/daftar-janji.html" }
   ]
 }
