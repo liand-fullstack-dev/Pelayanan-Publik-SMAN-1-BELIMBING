@@ -1,14 +1,8 @@
-/* ============================================
-   SISTEM PELAYANAN PUBLIK - SMAN 1 BELIMBING
-   Node.js + Express Backend Server
-   ============================================ */
-
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
@@ -44,24 +38,24 @@ app.post('/api/appointments', (req, res) => {
     try {
         const dataDir = path.join(__dirname, 'data');
         if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-
+        
         const filePath = path.join(dataDir, 'appointments.json');
         let appointments = [];
-
+        
         if (fs.existsSync(filePath)) {
             appointments = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         }
-
+        
         const newAppointment = {
             ...req.body,
             id: 'apt-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
-
+        
         appointments.push(newAppointment);
         fs.writeFileSync(filePath, JSON.stringify(appointments, null, 2));
-
+        
         res.status(201).json({ success: true, data: newAppointment });
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });
@@ -73,17 +67,17 @@ app.get('/api/stats', (req, res) => {
         const dataDir = path.join(__dirname, 'data');
         const filePath = path.join(dataDir, 'appointments.json');
         let appointments = [];
-
+        
         if (fs.existsSync(filePath)) {
             appointments = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         }
-
+        
         const today = new Date().toISOString().split('T')[0];
         const weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
         const monthStart = new Date();
         monthStart.setDate(1);
-
+        
         res.json({
             total: appointments.length,
             today: appointments.filter(a => a.tanggal === today && a.status !== 'Dibatalkan').length,
@@ -104,7 +98,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Sistem Pelayanan Publik SMAN 1 BELIMBING`);
-    console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+// Export untuk Vercel
+module.exports = app;
+
+// Jalankan server jika di lokal
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server berjalan di http://localhost:${PORT}`);
+    });
+}
