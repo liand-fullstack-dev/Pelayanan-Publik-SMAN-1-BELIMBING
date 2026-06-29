@@ -23,14 +23,12 @@ function writeData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-// API Routes
 app.get('/api/appointments', (req, res) => {
     res.json(readData());
 });
 
 app.post('/api/appointments', (req, res) => {
     const appointments = readData();
-    
     const newAppointment = {
         ...req.body,
         id: 'apt-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
@@ -38,13 +36,10 @@ app.post('/api/appointments', (req, res) => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
-
     const existingCount = appointments.filter(a => a.status !== 'Dibatalkan').length;
     newAppointment.nomorAntrian = 'A-' + String(existingCount + 1).padStart(3, '0');
-
     appointments.push(newAppointment);
     writeData(appointments);
-
     res.status(201).json({ success: true, data: newAppointment });
 });
 
