@@ -13,7 +13,7 @@ const DATA_FILE = path.join('/tmp', 'appointments.json');
 function readData() {
     try {
         if (!fs.existsSync(DATA_FILE)) return [];
-        return JSON.parse(fs.readFile        return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     } catch (e) {
         return [];
     }
