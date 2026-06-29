@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - SMAN 1 BELIMBING</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 260px;
+            background: var(--color-secondary);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: var(--z-sticky);
+            display: flex;
+            flex-direction: column;
+            transition: transform var(--transition-base);
+        }
+
+        .admin-sidebar-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .admin-sidebar-logo i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .admin-sidebar-logo span {
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .admin-sidebar-nav {
+            flex: 1;
+            padding: var(--space-4);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .admin-sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .admin-sidebar-link:hover,
+        .admin-sidebar-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .admin-sidebar-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .admin-sidebar-footer {
+            padding: var(--space-4);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius-lg);
+        }
+
+        .admin-user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .admin-user-info {
+            flex: 1;
+        }
+
+        .admin-user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .admin-user-role {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            background: var(--color-bg-secondary);
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-4) var(--space-8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .admin-content {
+            padding: var(--space-8);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+
+        .dashboard-card {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            transition: all var(--transition-base);
+        }
+
+        .dashboard-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+
+        .dashboard-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .dashboard-card-icon.blue { background: var(--color-primary-50); color: var(--color-primary); }
+        .dashboard-card-icon.green { background: var(--color-success-light); color: var(--color-success); }
+        .dashboard-card-icon.orange { background: var(--color-warning-light); color: var(--color-warning); }
+        .dashboard-card-icon.red { background: var(--color-danger-light); color: var(--color-danger); }
+
+        .dashboard-card-trend {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+        }
+
+        .dashboard-card-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--color-text);
+            line-height: 1;
+            margin-bottom: var(--space-2);
+        }
+
+        .dashboard-card-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        .dashboard-section {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .dashboard-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+        }
+
+        .dashboard-section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table th {
+            text-align: left;
+            padding: var(--space-3) var(--space-4);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--color-border);
+            white-space: nowrap;
+        }
+
+        .dashboard-table td {
+            padding: var(--space-4);
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--color-border-light);
+            vertical-align: middle;
+        }
+
+        .dashboard-table tr:hover td {
+            background: var(--color-bg-secondary);
+        }
+
+        .dashboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .table-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-tertiary);
+            background: var(--color-bg-secondary);
+            transition: all var(--transition-fast);
+            font-size: 0.75rem;
+        }
+
+        .table-action-btn:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .table-action-btn.danger:hover {
+            background: var(--color-danger);
+        }
+
+        .table-action-btn.success:hover {
+            background: var(--color-success);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            padding: var(--space-4) 0;
+        }
+
+        .chart-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-2);
+            flex: 1;
+        }
+
+        .chart-bar-fill {
+            width: 32px;
+            background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            transition: height 1s ease-out;
+            min-height: 4px;
+        }
+
+        .chart-bar-label {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            font-weight: 500;
+        }
+
+        .chart-bar-value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .admin-sidebar-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text);
+            font-size: 1.25rem;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 199;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-sidebar-toggle {
+                display: flex;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-content {
+                padding: var(--space-4);
+            }
+
+            .admin-header {
+                padding: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="admin-sidebar-header">
+                <div class="admin-sidebar-logo">
+                    <i class="fas fa-school"></i>
+                    <span>SMAN 1 BELIMBING</span>
+                </div>
+            </div>
+            <nav class="admin-sidebar-nav">
+                <a href="#" class="admin-sidebar-link active" data-page="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="admin-sidebar-link" data-page="appointments">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Janji Temu</span>
+                </a>
+                <a href="#" class="admin-sidebar-link" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>Pengguna</span>
+                </a>
+                <a href="#" class="admin-sidebar-link" data-page="logs">
+                    <i class="fas fa-history"></i>
+                    <span>Log Aktivitas</span>
+                </a>
+                <a href="/" class="admin-sidebar-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Kembali ke Website</span>
+                </a>
+            </nav>
+            <div class="admin-sidebar-footer">
+                <div class="admin-user">
+                    <div class="admin-user-avatar">A</div>
+                    <div class="admin-user-info">
+                        <div class="admin-user-name">Admin</div>
+                        <div class="admin-user-role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <button class="admin-sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Dashboard Admin</h1>
+                </div>
+                <div class="admin-header-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats Cards -->
+                <div class="dashboard-stats">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon blue">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <span class="dashboard-card-trend" style="background: var(--color-success-light); color: var(--color-success);">+12%</span>
+                        </div>
+                        <div class="dashboard-card-value" id="dashTotal">0</div>
+                        <div class="dashboard-card-label">Total Janji Temu</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <span class="dashboard-card-trend" style="background: var(--color-success-light); color: var(--color-success);">+5%</span>
+                        </div>
+                        <div class="dashboard-card-value" id="dashDone">0</div>
+                        <div class="dashboard-card-label">Selesai</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon orange">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <span class="dashboard-card-trend" style="background: var(--color-warning-light); color: var(--color-warning);">+8%</span>
+                        </div>
+                        <div class="dashboard-card-value" id="dashWaiting">0</div>
+                        <div class="dashboard-card-label">Menunggu</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon red">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <span class="dashboard-card-trend" style="background: var(--color-primary-50); color: var(--color-primary);">Hari Ini</span>
+                        </div>
+                        <div class="dashboard-card-value" id="dashToday">0</div>
+                        <div class="dashboard-card-label">Janji Hari Ini</div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-header">
+                        <h2 class="dashboard-section-title">Grafik Kunjungan</h2>
+                        <select class="filter-select" id="chartPeriod" style="min-width: 120px;">
+                            <option value="7">7 Hari Terakhir</option>
+                            <option value="30">30 Hari Terakhir</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" id="chartContainer">
+                        <div class="chart-bar" id="chartBar"></div>
+                    </div>
+                </div>
+
+                <!-- Appointments Table -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-header">
+                        <h2 class="dashboard-section-title">Daftar Janji Temu</h2>
+                        <div style="display: flex; gap: var(--space-3);">
+                            <input type="text" class="filter-input" id="adminSearch" placeholder="Cari..." style="min-width: 200px;">
+                            <button class="btn btn-primary btn-sm" onclick="exportData('excel')">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Excel</span>
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="exportData('pdf')">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Nomor</th>
+                                    <th>Nama</th>
+                                    <th>Tujuan</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: var(--space-10);">
+                                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--color-primary); margin-bottom: var(--space-3); display: block;"></i>
+                                        Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="adminPagination" style="margin-top: var(--space-6);"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+    <script>
+    (function() {
+        const ITEMS_PER_PAGE = 10;
+        let currentPage = 1;
+        let filteredData = [];
+
+        const statusClasses = {
+            'Menunggu Konfirmasi': 'status-waiting',
+            'Dikonfirmasi': 'status-confirmed',
+            'Selesai': 'status-done',
+            'Dibatalkan': 'status-cancelled'
+        };
+
+        const statusOptions = ['Menunggu Konfirmasi', 'Dikonfirmasi', 'Selesai', 'Dibatalkan'];
+
+        function init() {
+            loadData();
+            setupEventListeners();
+            renderChart();
+        }
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem('appointments');
+                if (stored) {
+                    AppState.appointments = JSON.parse(stored);
+                }
+            } catch (e) {
+                AppState.appointments = [];
+            }
+
+            if (AppState.appointments.length === 0) {
+                AppointmentService.generateDummyData();
+            }
+
+            updateDashboardStats();
+            filterAndRenderTable();
+        }
+
+        function updateDashboardStats() {
+            const today = new Date().toISOString().split('T')[0];
+
+            const stats = {
+                total: AppState.appointments.length,
+                done: AppState.appointments.filter(a => a.status === 'Selesai').length,
+                waiting: AppState.appointments.filter(a => a.status === 'Menunggu Konfirmasi').length,
+                today: AppState.appointments.filter(a => a.tanggal === today && a.status !== 'Dibatalkan').length
+            };
+
+            document.getElementById('dashTotal').textContent = stats.total;
+            document.getElementById('dashDone').textContent = stats.done;
+            document.getElementById('dashWaiting').textContent = stats.waiting;
+            document.getElementById('dashToday').textContent = stats.today;
+        }
+
+        function renderChart() {
+            const container = document.getElementById('chartBar');
+            const days = 7;
+            const data = [];
+
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const count = AppState.appointments.filter(a => a.tanggal === dateStr).length;
+                const label = date.toLocaleDateString('id-ID', { weekday: 'short' });
+                data.push({ label, value: count });
+            }
+
+            const maxValue = Math.max(...data.map(d => d.value), 1);
+
+            container.innerHTML = data.map(d => `
+                <div class="chart-bar-item">
+                    <span class="chart-bar-value">${d.value}</span>
+                    <div class="chart-bar-fill" style="height: ${(d.value / maxValue * 200)}px;"></div>
+                    <span class="chart-bar-label">${d.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function filterAndRenderTable() {
+            const search = document.getElementById('adminSearch').value.toLowerCase();
+
+            filteredData = AppState.appointments.filter(apt => {
+                return !search || 
+                    apt.namaLengkap.toLowerCase().includes(search) ||
+                    apt.nomorAntrian.toLowerCase().includes(search) ||
+                    apt.tujuanBertemu.toLowerCase().includes(search);
+            });
+
+            filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            renderTable();
+            renderPagination();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('adminTableBody');
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: var(--space-10); color: var(--color-text-tertiary);">
+                            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: var(--space-3); display: block;"></i>
+                            Tidak ada data
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageItems = filteredData.slice(start, end);
+
+            tbody.innerHTML = pageItems.map(apt => `
+                <tr data-id="${apt.id}">
+                    <td><strong>${apt.nomorAntrian}</strong></td>
+                    <td>${apt.namaLengkap}</td>
+                    <td>${apt.tujuanBertemu}</td>
+                    <td>${Utils.formatDate(apt.tanggal)}</td>
+                    <td>${Utils.formatTime(apt.jam)}</td>
+                    <td>
+                        <span class="table-status ${statusClasses[apt.status] || 'status-waiting'}">
+                            <i class="fas fa-circle" style="font-size: 6px;"></i>
+                            ${apt.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="table-action-btn success" onclick="confirmAppointment('${apt.id}')" title="Konfirmasi">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="table-action-btn" onclick="editStatus('${apt.id}')" title="Edit Status">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="table-action-btn danger" onclick="deleteAppointment('${apt.id}')" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            const pagination = document.getElementById('adminPagination');
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="adminGoToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="adminGoToPage(${i})">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span class="page-btn" style="cursor: default;">...</span>`;
+                }
+            }
+
+            html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="adminGoToPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+            pagination.innerHTML = html;
+        }
+
+        window.adminGoToPage = function(page) {
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+            renderPagination();
+        };
+
+        window.confirmAppointment = function(id) {
+            const apt = AppState.appointments.find(a => a.id === id);
+            if (!apt) return;
+
+            apt.status = 'Dikonfirmasi';
+            apt.updatedAt = new Date().toISOString();
+            AppointmentService.saveToStorage();
+
+            updateDashboardStats();
+            filterAndRenderTable();
+            Toast.success('Berhasil', `Janji ${apt.nomorAntrian} telah dikonfirmasi`);
+        };
+
+        window.editStatus = function(id) {
+            const apt = AppState.appointments.find(a => a.id === id);
+            if (!apt) return;
+
+            const options = statusOptions.map(s => 
+                `<option value="${s}" ${s === apt.status ? 'selected' : ''}>${s}</option>`
+            ).join('');
+
+            Modal.open('Ubah Status', `
+                <div style="margin-bottom: var(--space-4);">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: var(--space-2);">Status Janji ${apt.nomorAntrian}</label>
+                    <select id="editStatusSelect" class="filter-select" style="width: 100%;">
+                        ${options}
+                    </select>
+                </div>
+            `, [
+                { text: 'Batal', class: 'btn btn-outline', close: true },
+                { 
+                    text: 'Simpan', 
+                    class: 'btn btn-primary',
+                    onClick: () => {
+                        const newStatus = document.getElementById('editStatusSelect').value;
+                        apt.status = newStatus;
+                        apt.updatedAt = new Date().toISOString();
+                        AppointmentService.saveToStorage();
+                        updateDashboardStats();
+                        filterAndRenderTable();
+                        Toast.success('Berhasil', 'Status telah diperbarui');
+                    }
+                }
+            ]);
+        };
+
+        window.deleteAppointment = function(id) {
+            const apt = AppState.appointments.find(a => a.id === id);
+            if (!apt) return;
+
+            Modal.open('Konfirmasi Hapus', `
+                <div style="text-align: center; padding: var(--space-4);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--color-warning); margin-bottom: var(--space-4); display: block;"></i>
+                    <h3 style="margin-bottom: var(--space-2);">Hapus Janji Temu?</h3>
+                    <p style="color: var(--color-text-secondary);">Janji <strong>${apt.nomorAntrian}</strong> milik <strong>${apt.namaLengkap}</strong> akan dihapus permanen.</p>
+                </div>
+            `, [
+                { text: 'Batal', class: 'btn btn-outline', close: true },
+                { 
+                    text: 'Hapus', 
+                    class: 'btn btn-primary',
+                    onClick: () => {
+                        AppState.appointments = AppState.appointments.filter(a => a.id !== id);
+                        AppointmentService.saveToStorage();
+                        updateDashboardStats();
+                        filterAndRenderTable();
+                        Toast.success('Berhasil', 'Janji telah dihapus');
+                    }
+                }
+            ]);
+        };
+
+        window.exportData = function(format) {
+            if (format === 'excel') {
+                // Simple CSV export
+                const headers = ['Nomor Antrian', 'Nama', 'WhatsApp', 'Instansi', 'Tujuan', 'Keperluan', 'Tanggal', 'Jam', 'Status', 'Waktu Pengajuan'];
+                const rows = AppState.appointments.map(a => [
+                    a.nomorAntrian,
+                    a.namaLengkap,
+                    a.nomorWA,
+                    a.instansi || '-',
+                    a.tujuanBertemu,
+                    a.keperluan,
+                    a.tanggal,
+                    a.jam,
+                    a.status,
+                    a.createdAt
+                ]);
+
+                const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `janji-temu-${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                Toast.success('Export Berhasil', 'File CSV telah diunduh');
+            } else {
+                Toast.info('Info', 'Export PDF memerlukan backend server');
+            }
+        };
+
+        function setupEventListeners() {
+            document.getElementById('adminSearch').addEventListener('input', 
+                Utils.debounce(() => { currentPage = 1; filterAndRenderTable(); }, 300));
+
+            document.getElementById('chartPeriod').addEventListener('change', () => {
+                renderChart();
+            });
+
+            // Sidebar toggle
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggle = document.getElementById('sidebarToggle');
+
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+
+            // Sidebar nav
+            document.querySelectorAll('.admin-sidebar-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.getAttribute('href') === '/') return;
+                    e.preventDefault();
+                    document.querySelectorAll('.admin-sidebar-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    })();
+    </script>
+</body>
+</html>
