@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e
 
-echo "Deploying Edge Functions..."
+echo "Linking project..."
 
 supabase link \
   --project-ref "$SUPABASE_PROJECT_ID" \
   --password "$SUPABASE_DB_PASSWORD"
+
+echo "Deploying Edge Functions..."
 
 supabase functions deploy appointments
 supabase functions deploy stats
