@@ -1,52 +1,22 @@
-# Supabase Configuration for SMAN 1 Belimbing
-# Generated: 2026-06-29
-
-[project]
-id = "sman1belimbing"
-name = "SMAN 1 Belimbing Appointment System"
+project_id = "jqfwkvffhnmdillpmxsa"
 
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
-extra_search_path = ["public", "extensions"]
-max_rows = 1000
+schemas = ["public"]
 
 [db]
 port = 54322
-shadow_port = 54320
 major_version = 15
-
-[db.pooler]
-enabled = false
-port = 54329
-
-[realtime]
-enabled = true
 
 [studio]
 enabled = true
 port = 54323
-api_url = "http://localhost:54321"
-
-[inbucket]
-enabled = true
-port = 54324
-
-[storage]
-enabled = true
 
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
-jwt_expiry = 3600
 
-[edge_runtime]
-enabled = true
-inspector_port = 8083
-
-[functions]
 [functions.appointments]
 verify_jwt = false
 
