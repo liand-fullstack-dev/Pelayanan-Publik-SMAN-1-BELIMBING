@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - SMAN 1 BELIMBING</title>
+    <link rel="icon" href="/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
     <style>
@@ -14,7 +17,7 @@
         .admin-sidebar-header { padding: var(--space-6); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .admin-sidebar-logo { display: flex; align-items: center; gap: var(--space-3); }
         .admin-sidebar-logo img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
-        .admin-sidebar-logo span { font-weight: 800; font-size: 0.875rem; letter-spacing: -0.02em; }
+        .admin-sidebar-logo span { font-family: var(--font-sans); font-weight: 700; font-size: 0.8125rem; letter-spacing: -0.01em; }
         .admin-sidebar-nav { flex: 1; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
         .admin-sidebar-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); color: rgba(255,255,255,0.7); font-size: 0.875rem; font-weight: 500; transition: all var(--transition-fast); }
         .admin-sidebar-link:hover, .admin-sidebar-link.active { background: rgba(255,255,255,0.1); color: white; }
@@ -27,7 +30,7 @@
         .admin-user-role { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
         .admin-main { flex: 1; margin-left: 260px; background: var(--color-bg-secondary); min-height: 100vh; }
         .admin-header { background: var(--color-bg); border-bottom: 1px solid var(--color-border); padding: var(--space-4) var(--space-8); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .admin-header h1 { font-size: 1.25rem; font-weight: 700; }
+        .admin-header h1 { font-family: var(--font-sans); font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.015em; }
         .admin-header-actions { display: flex; gap: var(--space-3); align-items: center; }
         .admin-content { padding: var(--space-8); }
         .dashboard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); margin-bottom: var(--space-8); }
@@ -40,11 +43,11 @@
         .dashboard-card-icon.orange { background: var(--color-warning-light); color: var(--color-warning); }
         .dashboard-card-icon.red { background: var(--color-danger-light); color: var(--color-danger); }
         .dashboard-card-trend { font-size: 0.75rem; font-weight: 600; padding: var(--space-1) var(--space-2); border-radius: var(--radius-md); }
-        .dashboard-card-value { font-size: 2rem; font-weight: 800; color: var(--color-text); line-height: 1; margin-bottom: var(--space-2); }
+        .dashboard-card-value { font-family: var(--font-display); font-size: 1.875rem; font-weight: 500; color: var(--color-text); line-height: 1; margin-bottom: var(--space-2); }
         .dashboard-card-label { font-size: 0.875rem; color: var(--color-text-secondary); }
         .dashboard-section { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); margin-bottom: var(--space-6); }
         .dashboard-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3); }
-        .dashboard-section-title { font-size: 1.125rem; font-weight: 700; }
+        .dashboard-section-title { font-family: var(--font-sans); font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.01em; }
         .dashboard-table { width: 100%; border-collapse: collapse; }
         .dashboard-table th { text-align: left; padding: var(--space-3) var(--space-4); font-size: 0.75rem; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
         .dashboard-table td { padding: var(--space-4); font-size: 0.875rem; border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
@@ -102,7 +105,9 @@
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-sidebar-header">
                 <div class="admin-sidebar-logo">
-                    <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="sidebar-logo-img">
+                    <div class="logo-icon" style="width:36px;height:36px;">
+                        <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="sidebar-logo-img" style="width:100%;height:100%;">
+                    </div>
                     <span>SMAN 1 BELIMBING</span>
                 </div>
             </div>
@@ -250,6 +255,12 @@
             <div class="modal-footer" id="modalFooter"></div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="/script.js"></script>
+    <script>
+        if (window.gsap) {
+            gsap.from('.dashboard-card', { opacity: 0, y: 14, duration: 0.5, stagger: 0.06, ease: 'power3.out' });
+        }
+    </script>
 </body>
 </html>
