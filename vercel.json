@@ -1,4 +1,5 @@
 {
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/daftar-janji", "destination": "/daftar-janji.html" }
