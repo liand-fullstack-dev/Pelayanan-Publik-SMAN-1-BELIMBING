@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "installCommand": "echo 'no dependencies to install'",
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/daftar-janji", "destination": "/daftar-janji.html" }
