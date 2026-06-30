@@ -10,6 +10,9 @@ const CONFIG = {
   EDGE_FUNCTION_URL: "https://jqfwkvffhnmdillpmxsa.supabase.co/functions/v1",
   RATE_LIMIT_MAX: 30,
   RATE_LIMIT_WINDOW: 60000,
+  // Nomor WhatsApp resmi sekolah (format internasional tanpa "+", contoh: 6281234567890)
+  // GANTI dengan nomor WA admin/tata usaha SMAN 1 BELIMBING sebelum deploy.
+  SCHOOL_WHATSAPP_NUMBER: "6282382734762",
 };
 
 const Security = {
@@ -112,6 +115,44 @@ const Utils = {
         resolve("data:image/svg+xml;base64," + btoa(svg));
       }
     });
+  },
+};
+
+const WhatsAppHelper = {
+  // Build a wa.me click-to-chat link. number must be digits only (intl format, no +).
+  buildLink(number, message) {
+    const clean = (number || "").replace(/\D/g, "");
+    return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+  },
+  appointmentMessage(data) {
+    const nomor = data.nomor_antrian || data.nomorAntrian || "-";
+    const nama = data.nama_lengkap || data.namaLengkap || "-";
+    const tujuan = data.tujuan_bertemu || data.tujuanBertemu || "-";
+    const keperluan = data.keperluan || "-";
+    const instansi = data.instansi || "-";
+    return [
+      "Halo Admin SMAN 1 BELIMBING, saya ingin mengonfirmasi pengajuan janji kunjungan:",
+      "",
+      `Nomor Antrian: ${nomor}`,
+      `Nama: ${nama}`,
+      `Instansi/Asal: ${instansi}`,
+      `Tujuan Bertemu: ${tujuan}`,
+      `Keperluan: ${keperluan}`,
+      `Tanggal: ${Utils.formatDate(data.tanggal)}`,
+      `Jam: ${Utils.formatTime(data.jam)}`,
+      "",
+      "Mohon konfirmasinya, terima kasih.",
+    ].join("\n");
+  },
+  sendAppointmentToSchool(data) {
+    const link = this.buildLink(CONFIG.SCHOOL_WHATSAPP_NUMBER, this.appointmentMessage(data));
+    window.open(link, "_blank", "noopener");
+  },
+  contactVisitor(apt) {
+    const nama = apt.nama_lengkap || apt.namaLengkap || "";
+    const message = `Halo ${nama}, kami dari SMAN 1 BELIMBING ingin menginformasikan terkait janji temu Anda dengan nomor antrian ${apt.nomor_antrian || apt.nomorAntrian}.`;
+    const link = this.buildLink(apt.nomor_wa || apt.nomorWA, message);
+    window.open(link, "_blank", "noopener");
   },
 };
 
@@ -673,6 +714,7 @@ const FormHandler = {
       const data = await AppointmentService.create(v.values);
       Toast.success("Berhasil!", `Nomor antrian: ${data.nomor_antrian || data.nomorAntrian}`);
       this.showAppointmentCard(data);
+      setTimeout(() => Toast.info("Konfirmasi", "Klik tombol WhatsApp pada kartu untuk konfirmasi ke sekolah"), 1200);
       form.reset();
       const trigger = document.getElementById("tujuanTrigger");
       if (trigger) trigger.querySelector(".select-placeholder").textContent = "Pilih tujuan bertemu";
@@ -718,6 +760,9 @@ const FormHandler = {
       const text = `Janji Kunjungan SMAN 1 BELIMBING\nNomor: ${data.nomor_antrian || data.nomorAntrian}\nNama: ${data.nama_lengkap || data.namaLengkap}\nTujuan: ${data.tujuan_bertemu || data.tujuanBertemu}\nTanggal: ${Utils.formatDate(data.tanggal)}\nJam: ${Utils.formatTime(data.jam)}\nStatus: ${data.status}`;
       if (navigator.share) navigator.share({ title: "Janji Kunjungan", text });
       else navigator.clipboard.writeText(text).then(() => Toast.success("Disalin", "Detail disalin"));
+    });
+    document.getElementById("btnSendWA")?.addEventListener("click", () => {
+      WhatsAppHelper.sendAppointmentToSchool(data);
     });
     overlay.addEventListener("click", e => {
       if (e.target === overlay) { overlay.classList.remove("active"); setTimeout(() => overlay.classList.add("hidden"), 250); }
@@ -1020,7 +1065,7 @@ const AdminPage = {
     const end = start + this.itemsPerPage;
     const items = this.filteredData.slice(start, end);
     tbody.innerHTML = items.map(apt =>
-      `<tr data-id="${apt.id}"><td><strong>${apt.nomor_antrian || apt.nomorAntrian}</strong></td><td>${Security.sanitize(apt.nama_lengkap || apt.namaLengkap)}</td><td>${Security.sanitize(apt.tujuan_bertemu || apt.tujuanBertemu)}</td><td>${Utils.formatDate(apt.tanggal)}</td><td>${Utils.formatTime(apt.jam)}</td><td><span class="table-status ${sc[apt.status] || "status-waiting"}"><i class="fas fa-circle" style="font-size:6px;"></i> ${apt.status}</span></td><td><div class="table-actions"><button class="table-action-btn success" onclick="AdminPage.confirmApt('${apt.id}')" title="Konfirmasi"><i class="fas fa-check"></i></button><button class="table-action-btn" onclick="AdminPage.editStatus('${apt.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="table-action-btn danger" onclick="AdminPage.deleteApt('${apt.id}')" title="Hapus"><i class="fas fa-trash"></i></button></div></td></tr>`
+      `<tr data-id="${apt.id}"><td><strong>${apt.nomor_antrian || apt.nomorAntrian}</strong></td><td>${Security.sanitize(apt.nama_lengkap || apt.namaLengkap)}</td><td>${Security.sanitize(apt.tujuan_bertemu || apt.tujuanBertemu)}</td><td>${Utils.formatDate(apt.tanggal)}</td><td>${Utils.formatTime(apt.jam)}</td><td><span class="table-status ${sc[apt.status] || "status-waiting"}"><i class="fas fa-circle" style="font-size:6px;"></i> ${apt.status}</span></td><td><div class="table-actions"><button class="table-action-btn" style="color:#25D366;" onclick="AdminPage.contactWA('${apt.id}')" title="Hubungi via WhatsApp"><i class="fab fa-whatsapp"></i></button><button class="table-action-btn success" onclick="AdminPage.confirmApt('${apt.id}')" title="Konfirmasi"><i class="fas fa-check"></i></button><button class="table-action-btn" onclick="AdminPage.editStatus('${apt.id}')" title="Edit"><i class="fas fa-edit"></i></button><button class="table-action-btn danger" onclick="AdminPage.deleteApt('${apt.id}')" title="Hapus"><i class="fas fa-trash"></i></button></div></td></tr>`
     ).join("");
   },
 
@@ -1046,6 +1091,12 @@ const AdminPage = {
     this.currentPage = page;
     this.renderTable();
     this.renderPagination();
+  },
+
+  contactWA(id) {
+    const apt = AppState.appointments.find(a => a.id === id);
+    if (!apt) return;
+    WhatsAppHelper.contactVisitor(apt);
   },
 
   async confirmApt(id) {
