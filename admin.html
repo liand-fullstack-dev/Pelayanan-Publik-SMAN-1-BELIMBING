@@ -13,8 +13,8 @@
         .admin-sidebar { width: 260px; background: var(--color-secondary); color: white; position: fixed; top: 0; left: 0; bottom: 0; z-index: var(--z-sticky); display: flex; flex-direction: column; transition: transform var(--transition-base); }
         .admin-sidebar-header { padding: var(--space-6); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .admin-sidebar-logo { display: flex; align-items: center; gap: var(--space-3); }
-        .admin-sidebar-logo i { width: 40px; height: 40px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-        .admin-sidebar-logo span { font-weight: 700; font-size: 0.875rem; }
+        .admin-sidebar-logo img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+        .admin-sidebar-logo span { font-weight: 800; font-size: 0.875rem; letter-spacing: -0.02em; }
         .admin-sidebar-nav { flex: 1; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
         .admin-sidebar-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); color: rgba(255,255,255,0.7); font-size: 0.875rem; font-weight: 500; transition: all var(--transition-fast); }
         .admin-sidebar-link:hover, .admin-sidebar-link.active { background: rgba(255,255,255,0.1); color: white; }
@@ -102,7 +102,7 @@
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-sidebar-header">
                 <div class="admin-sidebar-logo">
-                    <i class="fas fa-school"></i>
+                    <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="sidebar-logo-img">
                     <span>SMAN 1 BELIMBING</span>
                 </div>
             </div>
