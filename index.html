@@ -4,20 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Pelayanan Publik - SMAN 1 BELIMBING</title>
+    <meta name="description" content="Ajukan janji temu dan kunjungan ke SMAN 1 Belimbing secara digital — cepat, terstruktur, satu portal.">
+    <link rel="icon" href="/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
+<!-- ===================== INTRO ===================== -->
+<section id="intro" aria-label="Animasi pembuka SMAN 1 Belimbing">
+    <canvas id="star-canvas" aria-hidden="true"></canvas>
+    <div class="intro-grain" aria-hidden="true"></div>
+    <button id="skip-intro" type="button">Lewati <span>→</span></button>
+    <div class="intro-progress" aria-hidden="true"><span id="progress-fill"></span></div>
+
+    <div class="intro-stage">
+        <div class="eyebrow-row">
+            <span class="eyebrow mono">PORTAL LAYANAN</span>
+            <span class="eyebrow-divider" aria-hidden="true"></span>
+            <span class="eyebrow mono">SMAN 1 BELIMBING</span>
+        </div>
+
+        <div class="emblem-wrap">
+            <svg id="emblem-svg" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path id="shield-path" d="M100 8 L186 40 V120 C186 168 148 198 100 212 C52 198 14 168 14 120 V40 Z" stroke="#f2c230" stroke-width="2.5"/>
+                <path id="star-path" d="M100 56 L114 92 L152 92 L121 114 L132 150 L100 128 L68 150 L79 114 L48 92 L86 92 Z" stroke="#f7d564" stroke-width="2"/>
+            </svg>
+            <img id="school-logo-intro" src="/logo.png" alt="Logo SMAN 1 Belimbing" decoding="async" onerror="this.dataset.missing='1'">
+        </div>
+
+        <h1 class="title-line" aria-label="SMAN 1 BELIMBING">
+            <span class="word" data-word="SMAN">SMAN</span>
+            <span class="word" data-word="1">1</span>
+            <span class="word word-belimbing" data-word="BELIMBING">BELIMBING</span>
+        </h1>
+
+        <p class="tagline">Pelayanan publik sekolah, satu pintu.</p>
+    </div>
+</section>
+    <main id="site">
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">
                 <div class="logo-icon">
-                    <i class="fas fa-school"></i>
+                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="logo-img">
                 </div>
                 <div class="logo-text">
                     <span class="logo-title">SMAN 1 BELIMBING</span>
-                    <span class="logo-subtitle">Sistem Pelayanan Publik</span>
+                    <span class="logo-subtitle">Pelayanan Publik</span>
                 </div>
             </a>
             <button class="nav-toggle" id="navToggle" aria-label="Menu">
@@ -39,11 +76,7 @@
     </nav>
 
     <section class="hero" id="hero">
-        <div class="hero-bg">
-            <div class="hero-shape shape-1"></div>
-            <div class="hero-shape shape-2"></div>
-            <div class="hero-shape shape-3"></div>
-        </div>
+        <div class="hero-bg" aria-hidden="true"></div>
         <div class="hero-container">
             <div class="hero-content">
                 <div class="hero-badge">
@@ -51,12 +84,11 @@
                     <span>Sistem Resmi Sekolah</span>
                 </div>
                 <h1 class="hero-title">
-                    Sistem Pelayanan Publik
-                    <span class="hero-highlight">SMAN 1 BELIMBING</span>
+                    Janji temu sekolah,
+                    <span class="hero-highlight">tanpa antre dua kali.</span>
                 </h1>
                 <p class="hero-desc">
-                    Platform digital untuk mengatur janji temu antara masyarakat dan pihak sekolah. 
-                    Cepat, terstruktur, dan profesional.
+                    Ajukan kunjungan ke SMAN 1 Belimbing secara digital. Pilih tujuan dan jadwal, sistem memberi nomor antrian, dan konfirmasi terkirim otomatis ke sekolah.
                 </p>
                 <div class="hero-actions">
                     <a href="#form-janji" class="btn btn-primary btn-lg">
@@ -109,38 +141,26 @@
             <div class="section-header">
                 <span class="section-tag">Alur Penggunaan</span>
                 <h2 class="section-title">Cara Menggunakan Sistem</h2>
-                <p class="section-desc">Empat langkah sederhana untuk membuat janji temu</p>
+                <p class="section-desc">Empat langkah, dari formulir sampai kartu janji temu</p>
             </div>
             <div class="alur-grid">
                 <div class="alur-card">
                     <div class="alur-number">01</div>
-                    <div class="alur-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
                     <h3>Isi Formulir</h3>
                     <p>Lengkapi data diri, tujuan bertemu, dan jadwal yang diinginkan.</p>
                 </div>
                 <div class="alur-card">
                     <div class="alur-number">02</div>
-                    <div class="alur-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
                     <h3>Validasi Sistem</h3>
                     <p>Sistem memeriksa ketersediaan jadwal dan memberikan nomor antrian.</p>
                 </div>
                 <div class="alur-card">
                     <div class="alur-number">03</div>
-                    <div class="alur-icon">
-                        <i class="fas fa-paper-plane"></i>
-                    </div>
-                    <h3>Konfirmasi WhatsApp</h3>
-                    <p>Setelah formulir berhasil dikirim, Anda akan diarahkan ke WhatsApp untuk mengonfirmasi janji temu ke pihak sekolah.</p>
+                    <h3>Terkirim ke Sekolah</h3>
+                    <p>Detail janji temu langsung diteruskan ke WhatsApp sekolah secara otomatis — tidak perlu mengirim ulang.</p>
                 </div>
                 <div class="alur-card">
                     <div class="alur-number">04</div>
-                    <div class="alur-icon">
-                        <i class="fas fa-id-card"></i>
-                    </div>
                     <h3>Terima Kartu Janji</h3>
                     <p>Dapatkan kartu janji dengan kode QR untuk verifikasi saat datang.</p>
                 </div>
@@ -347,7 +367,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Setelah pengajuan, Anda akan diarahkan ke WhatsApp untuk mengirim konfirmasi ke pihak sekolah. Status awal adalah "Menunggu Konfirmasi" dan akan diperbarui oleh admin sekolah.</p>
+                        <p>Setelah pengajuan berhasil, detail janji temu Anda otomatis diteruskan ke WhatsApp sekolah di latar belakang — Anda tidak perlu mengirim apa pun secara manual. Status awal adalah "Menunggu Konfirmasi" dan akan diperbarui oleh admin sekolah.</p>
                     </div>
                 </div>
                 <div class="faq-item">
@@ -381,11 +401,11 @@
         </div>
     </section>
 
-    <footer class="footer">
+    <footer class="footer" id="kontak">
         <div class="footer-container">
             <div class="footer-brand">
                 <div class="footer-logo">
-                    <i class="fas fa-school"></i>
+                    <img src="/logo.png" alt="" class="footer-logo-img">
                     <span>SMAN 1 BELIMBING</span>
                 </div>
                 <p class="footer-desc">Sistem Pelayanan Publik untuk memudahkan masyarakat dalam berkomunikasi dengan pihak sekolah.</p>
@@ -416,6 +436,7 @@
             <p>SMAN 1 BELIMBING. Sistem Pelayanan Publik.</p>
         </div>
     </footer>
+    </main>
 
     <div class="modal-overlay hidden" id="modalOverlay">
         <div class="modal" id="modal">
@@ -437,7 +458,7 @@
             <div class="appointment-card" id="appointmentCard">
                 <div class="card-header">
                     <div class="card-logo">
-                        <i class="fas fa-school"></i>
+                        <img src="/logo.png" alt="" class="card-logo-img">
                     </div>
                     <div class="card-school">
                         <span class="card-school-name">SMAN 1 BELIMBING</span>
@@ -494,15 +515,14 @@
                     <span>Bagikan</span>
                 </button>
             </div>
-            <div class="card-actions" style="margin-top:8px;">
-                <button class="btn btn-whatsapp" id="btnSendWA" style="width:100%;background:#25D366;color:#fff;border:none;">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>Kirim Konfirmasi ke WhatsApp Sekolah</span>
-                </button>
-            </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script src="/intro.js"></script>
     <script src="/script.js"></script>
 </body>
 </html>
