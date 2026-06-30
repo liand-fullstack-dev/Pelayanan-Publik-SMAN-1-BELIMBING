@@ -146,7 +146,10 @@ const WhatsAppHelper = {
   },
   sendAppointmentToSchool(data) {
     const link = this.buildLink(CONFIG.SCHOOL_WHATSAPP_NUMBER, this.appointmentMessage(data));
-    window.open(link, "_blank", "noopener");
+    // Open in a background tab: a new tab is created but focus stays on
+    // the current page so the visitor keeps seeing their appointment card.
+    const win = window.open(link, "_blank", "noopener");
+    if (win) { try { window.focus(); } catch (e) {} }
   },
   contactVisitor(apt) {
     const nama = apt.nama_lengkap || apt.namaLengkap || "";
@@ -717,7 +720,8 @@ const FormHandler = {
       const data = await AppointmentService.create(v.values);
       Toast.success("Berhasil!", `Nomor antrian: ${data.nomor_antrian || data.nomorAntrian}`);
       this.showAppointmentCard(data);
-      setTimeout(() => Toast.info("Konfirmasi", "Klik tombol WhatsApp pada kartu untuk konfirmasi ke sekolah"), 1200);
+      // Konfirmasi terkirim otomatis ke WhatsApp sekolah, tanpa aksi pengguna.
+      WhatsAppHelper.sendAppointmentToSchool(data);
       form.reset();
       const trigger = document.getElementById("tujuanTrigger");
       if (trigger) trigger.querySelector(".select-placeholder").textContent = "Pilih tujuan bertemu";
@@ -764,9 +768,6 @@ const FormHandler = {
       if (navigator.share) navigator.share({ title: "Janji Kunjungan", text });
       else navigator.clipboard.writeText(text).then(() => Toast.success("Disalin", "Detail disalin"));
     });
-    document.getElementById("btnSendWA")?.addEventListener("click", () => {
-      WhatsAppHelper.sendAppointmentToSchool(data);
-    });
     overlay.addEventListener("click", e => {
       if (e.target === overlay) { overlay.classList.remove("active"); setTimeout(() => overlay.classList.add("hidden"), 250); }
     });
@@ -788,9 +789,9 @@ const HeroStats = {
       const today = new Date().toISOString().split("T")[0];
       const ta = AppState.appointments.filter(a => a.tanggal === today).slice(0, 3);
       if (ta.length > 0) {
-        preview.innerHTML = ta.map(apt =>
-          `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--color-border);"><span style="font-weight:700;color:var(--color-primary);font-size:0.875rem;">${apt.nomor_antrian || apt.nomorAntrian}</span><span style="font-size:0.75rem;color:var(--color-text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${Security.sanitize(apt.nama_lengkap || apt.namaLengkap)}</span><span style="font-size:0.75rem;color:var(--color-text-tertiary);">${Utils.formatTime(apt.jam)}</span></div>`
-        ).join("");
+        preview.innerHTML = `<ul class="queue-preview-list">` + ta.map(apt =>
+          `<li class="queue-preview-item"><span class="queue-preview-num">${apt.nomor_antrian || apt.nomorAntrian}</span><span class="queue-preview-meta"><span class="queue-preview-name">${Security.sanitize(apt.nama_lengkap || apt.namaLengkap)}</span></span><span class="queue-preview-time">${Utils.formatTime(apt.jam)}</span></li>`
+        ).join("") + `</ul>`;
       } else {
         preview.innerHTML = `<div style="text-align:center;padding:24px;color:var(--color-text-tertiary);font-size:0.875rem;"><i class="fas fa-calendar-check" style="font-size:1.5rem;margin-bottom:8px;display:block;"></i>Tidak ada antrian hari ini</div>`;
       }
