@@ -327,8 +327,11 @@ const AppointmentService = {
       console.error("Fetch error:", e);
       try {
         const stored = localStorage.getItem("appointments");
-        if (stored) AppState.appointments = JSON.parse(stored);
+        AppState.appointments = stored ? JSON.parse(stored) : [];
       } catch (x) { AppState.appointments = []; }
+      if (!AppState.appointments || AppState.appointments.length === 0) {
+        this.generateDummyData();
+      }
       return AppState.appointments;
     }
   },
@@ -1204,13 +1207,14 @@ const AdminPage = {
 // ============================================
 // INITIALIZATION
 // ============================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   ThemeManager.init();
   Navigation.init();
   Modal.init();
   Toast.init();
   FAQManager.init();
   if (typeof window.supabase !== "undefined") getSupabase();
+  await AppointmentService.fetchAll();
   const path = window.location.pathname;
   if (path === "/" || path === "/index.html") {
     FormHandler.init();
