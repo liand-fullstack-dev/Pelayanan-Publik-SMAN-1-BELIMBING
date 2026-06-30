@@ -12,28 +12,28 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">
-                <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="logo-img">
+                <div class="logo-icon">
+                    <i class="fas fa-school"></i>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">SMAN 1 BELIMBING</span>
                     <span class="logo-subtitle">Sistem Pelayanan Publik</span>
                 </div>
             </a>
-            <div class="nav-right">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
-                <button class="nav-toggle" id="navToggle" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-menu" id="navMenu">
                 <a href="#hero" class="nav-link">Beranda</a>
                 <a href="#alur" class="nav-link">Alur</a>
                 <a href="#faq" class="nav-link">FAQ</a>
                 <a href="/daftar-janji" class="nav-link">Daftar Janji</a>
                 <a href="/admin" class="nav-link nav-link-admin">Admin</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -134,7 +134,7 @@
                         <i class="fas fa-paper-plane"></i>
                     </div>
                     <h3>Konfirmasi WhatsApp</h3>
-                    <p>Detail janji temu dikirim otomatis ke WhatsApp sekolah.</p>
+                    <p>Setelah formulir berhasil dikirim, Anda akan diarahkan ke WhatsApp untuk mengonfirmasi janji temu ke pihak sekolah.</p>
                 </div>
                 <div class="alur-card">
                     <div class="alur-number">04</div>
@@ -300,55 +300,12 @@
                     <div class="form-row">
                         <div class="form-field">
                             <label for="tanggal">Tanggal <span class="required">*</span></label>
-                            <div class="custom-date-wrapper" id="datePickerWrapper">
-                                <div class="custom-date-input" id="datePickerTrigger" tabindex="0" role="button" aria-label="Pilih tanggal">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span class="date-display placeholder" id="dateDisplay">Pilih tanggal kunjungan</span>
-                                    <i class="fas fa-chevron-down" style="font-size:0.75rem; color: var(--color-text-muted); margin-left: auto;"></i>
-                                </div>
-                                <div class="date-picker-panel" id="datePicker">
-                                    <div class="dp-header">
-                                        <button class="dp-nav-btn" id="dpPrev" aria-label="Bulan sebelumnya"><i class="fas fa-chevron-left"></i></button>
-                                        <span class="dp-month-year" id="dpMonthYear">Juni 2026</span>
-                                        <button class="dp-nav-btn" id="dpNext" aria-label="Bulan berikutnya"><i class="fas fa-chevron-right"></i></button>
-                                    </div>
-                                    <div class="dp-day-names">
-                                        <div class="dp-day-name">Min</div>
-                                        <div class="dp-day-name">Sen</div>
-                                        <div class="dp-day-name">Sel</div>
-                                        <div class="dp-day-name">Rab</div>
-                                        <div class="dp-day-name">Kam</div>
-                                        <div class="dp-day-name">Jum</div>
-                                        <div class="dp-day-name">Sab</div>
-                                    </div>
-                                    <div class="dp-days" id="dpDays"></div>
-                                </div>
-                            </div>
-                            <input type="hidden" id="tanggal" name="tanggal">
+                            <input type="date" id="tanggal" name="tanggal">
                             <span class="field-error" id="error-tanggal"></span>
                         </div>
                         <div class="form-field">
                             <label for="jam">Jam <span class="required">*</span></label>
-                            <div class="custom-time-wrapper" id="timePickerWrapper">
-                                <div class="custom-time-input" id="timePickerTrigger" tabindex="0" role="button" aria-label="Pilih jam">
-                                    <i class="fas fa-clock"></i>
-                                    <span class="time-display placeholder" id="timeDisplay">Pilih jam kunjungan</span>
-                                    <i class="fas fa-chevron-down" style="font-size:0.75rem; color: var(--color-text-muted); margin-left: auto;"></i>
-                                </div>
-                                <div class="time-picker-panel" id="timePicker">
-                                    <div class="tp-header">
-                                        <h4><i class="fas fa-clock" style="margin-right:6px;"></i>Pilih Jam</h4>
-                                        <p>Senin – Jumat, jam operasional sekolah</p>
-                                    </div>
-                                    <div class="tp-periods">
-                                        <button class="tp-period-btn active" data-period="pagi">🌅 Pagi</button>
-                                        <button class="tp-period-btn" data-period="siang">☀️ Siang</button>
-                                        <button class="tp-period-btn" data-period="sore">🌤️ Sore</button>
-                                    </div>
-                                    <div class="tp-slots" id="tpSlots"></div>
-                                </div>
-                            </div>
-                            <input type="hidden" id="jam" name="jam">
+                            <input type="time" id="jam" name="jam">
                             <span class="field-error" id="error-jam"></span>
                         </div>
                     </div>
@@ -390,7 +347,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Setelah pengajuan, sistem akan mengirimkan notifikasi ke WhatsApp sekolah. Status awal adalah "Menunggu Konfirmasi" dan akan diperbarui oleh admin sekolah.</p>
+                        <p>Setelah pengajuan, Anda akan diarahkan ke WhatsApp untuk mengirim konfirmasi ke pihak sekolah. Status awal adalah "Menunggu Konfirmasi" dan akan diperbarui oleh admin sekolah.</p>
                     </div>
                 </div>
                 <div class="faq-item">
@@ -428,7 +385,7 @@
         <div class="footer-container">
             <div class="footer-brand">
                 <div class="footer-logo">
-                    <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="footer-logo-img">
+                    <i class="fas fa-school"></i>
                     <span>SMAN 1 BELIMBING</span>
                 </div>
                 <p class="footer-desc">Sistem Pelayanan Publik untuk memudahkan masyarakat dalam berkomunikasi dengan pihak sekolah.</p>
@@ -480,7 +437,7 @@
             <div class="appointment-card" id="appointmentCard">
                 <div class="card-header">
                     <div class="card-logo">
-                        <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="card-logo-img">
+                        <i class="fas fa-school"></i>
                     </div>
                     <div class="card-school">
                         <span class="card-school-name">SMAN 1 BELIMBING</span>
@@ -537,179 +494,15 @@
                     <span>Bagikan</span>
                 </button>
             </div>
+            <div class="card-actions" style="margin-top:8px;">
+                <button class="btn btn-whatsapp" id="btnSendWA" style="width:100%;background:#25D366;color:#fff;border:none;">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Kirim Konfirmasi ke WhatsApp Sekolah</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <script src="/app.js"></script>
-    <script>
-    // ===== CUSTOM DATE PICKER =====
-    (function() {
-        const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-        let currentMonth, currentYear, selectedDate;
-        const today = new Date(); today.setHours(0,0,0,0);
-
-        function init() {
-            const now = new Date();
-            currentMonth = now.getMonth();
-            currentYear = now.getFullYear();
-            renderCalendar();
-            bindEvents();
-        }
-
-        function renderCalendar() {
-            document.getElementById('dpMonthYear').textContent = MONTHS_ID[currentMonth] + ' ' + currentYear;
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
-            let html = '';
-            // Prev month days
-            for (let i = firstDay - 1; i >= 0; i--) {
-                html += `<div class="dp-day other-month disabled">${daysInPrev - i}</div>`;
-            }
-            // Current month days
-            for (let d = 1; d <= daysInMonth; d++) {
-                const date = new Date(currentYear, currentMonth, d);
-                const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const isPast = date < today;
-                const isToday = date.getTime() === today.getTime();
-                const isSelected = selectedDate === dateStr;
-                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                const classes = ['dp-day', isPast ? 'disabled' : '', isToday ? 'today' : '', isSelected ? 'selected' : '', isWeekend && !isSelected ? 'weekend' : ''].filter(Boolean).join(' ');
-                html += `<div class="${classes}" data-date="${dateStr}" ${isPast ? '' : 'role="button" tabindex="0"'}>${d}</div>`;
-            }
-            // Next month filler
-            const total = firstDay + daysInMonth;
-            const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
-            for (let d = 1; d <= remaining; d++) {
-                html += `<div class="dp-day other-month disabled">${d}</div>`;
-            }
-            document.getElementById('dpDays').innerHTML = html;
-            // Day click events
-            document.querySelectorAll('#dpDays .dp-day:not(.disabled)').forEach(el => {
-                el.addEventListener('click', () => selectDate(el.dataset.date));
-                el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectDate(el.dataset.date); });
-            });
-        }
-
-        function selectDate(dateStr) {
-            selectedDate = dateStr;
-            document.getElementById('tanggal').value = dateStr;
-            const [y, m, d] = dateStr.split('-');
-            const dateObj = new Date(y, m-1, d);
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('dateDisplay').textContent = dateObj.toLocaleDateString('id-ID', options);
-            document.getElementById('dateDisplay').classList.remove('placeholder');
-            document.getElementById('error-tanggal').textContent = '';
-            closeDatePicker();
-            renderCalendar();
-        }
-
-        function openDatePicker() {
-            document.getElementById('datePicker').classList.add('open');
-            document.getElementById('datePickerTrigger').classList.add('focused');
-        }
-
-        function closeDatePicker() {
-            document.getElementById('datePicker').classList.remove('open');
-            document.getElementById('datePickerTrigger').classList.remove('focused');
-        }
-
-        function bindEvents() {
-            document.getElementById('datePickerTrigger').addEventListener('click', e => {
-                e.stopPropagation();
-                const isOpen = document.getElementById('datePicker').classList.contains('open');
-                closeAllPickers();
-                if (!isOpen) openDatePicker();
-            });
-            document.getElementById('dpPrev').addEventListener('click', e => {
-                e.stopPropagation();
-                currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-                renderCalendar();
-            });
-            document.getElementById('dpNext').addEventListener('click', e => {
-                e.stopPropagation();
-                currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-                renderCalendar();
-            });
-        }
-
-        window._closeDatePicker = closeDatePicker;
-        document.addEventListener('DOMContentLoaded', init);
-    })();
-
-    // ===== CUSTOM TIME PICKER =====
-    (function() {
-        const timeSlots = {
-            pagi:  ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30'],
-            siang: ['11:00','11:30','12:00','13:00','13:30','14:00'],
-            sore:  ['14:30','15:00','15:30','16:00']
-        };
-        let selectedTime = null;
-        let activePeriod = 'pagi';
-
-        function renderSlots() {
-            const slots = timeSlots[activePeriod];
-            document.getElementById('tpSlots').innerHTML = slots.map(t => {
-                const isSelected = selectedTime === t;
-                return `<div class="tp-slot ${isSelected ? 'selected' : ''}" data-time="${t}">${t}</div>`;
-            }).join('');
-            document.querySelectorAll('.tp-slot').forEach(el => {
-                el.addEventListener('click', () => selectTime(el.dataset.time));
-            });
-        }
-
-        function selectTime(time) {
-            selectedTime = time;
-            document.getElementById('jam').value = time;
-            document.getElementById('timeDisplay').textContent = time + ' WIB';
-            document.getElementById('timeDisplay').classList.remove('placeholder');
-            document.getElementById('error-jam').textContent = '';
-            closeTimePicker();
-            renderSlots();
-        }
-
-        function openTimePicker() {
-            document.getElementById('timePicker').classList.add('open');
-            document.getElementById('timePickerTrigger').classList.add('focused');
-        }
-
-        function closeTimePicker() {
-            document.getElementById('timePicker').classList.remove('open');
-            document.getElementById('timePickerTrigger').classList.remove('focused');
-        }
-
-        function closeAllPickers() {
-            if (window._closeDatePicker) window._closeDatePicker();
-            closeTimePicker();
-        }
-
-        window.closeAllPickers = closeAllPickers;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderSlots();
-            document.getElementById('timePickerTrigger').addEventListener('click', e => {
-                e.stopPropagation();
-                const isOpen = document.getElementById('timePicker').classList.contains('open');
-                closeAllPickers();
-                if (!isOpen) openTimePicker();
-            });
-            document.querySelectorAll('.tp-period-btn').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    e.stopPropagation();
-                    document.querySelectorAll('.tp-period-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activePeriod = btn.dataset.period;
-                    renderSlots();
-                });
-            });
-            document.addEventListener('click', e => {
-                if (!e.target.closest('#datePickerWrapper') && !e.target.closest('#timePickerWrapper')) {
-                    if (window._closeDatePicker) window._closeDatePicker();
-                    closeTimePicker();
-                }
-            });
-        });
-
-    </script>
 </body>
 </html>
