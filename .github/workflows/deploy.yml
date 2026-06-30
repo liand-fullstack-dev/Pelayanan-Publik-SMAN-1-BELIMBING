@@ -36,9 +36,6 @@ jobs:
             --project-ref "$SUPABASE_PROJECT_ID" \
             --password "$SUPABASE_DB_PASSWORD"
 
-     # - name: Apply Database Migrations
-      #  run: supabase db push
-
       - name: Deploy Edge Functions
         run: |
           supabase functions deploy appointments
