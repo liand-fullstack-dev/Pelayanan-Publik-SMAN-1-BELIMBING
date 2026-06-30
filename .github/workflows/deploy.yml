@@ -1,16 +1,49 @@
-#!/bin/bash
-set -e
+name: Deploy Supabase
 
-echo "Linking project..."
+on:
+  push:
+    branches:
+      - main
+      - master
 
-supabase link \
-  --project-ref "$SUPABASE_PROJECT_ID" \
-  --password "$SUPABASE_DB_PASSWORD"
+  workflow_dispatch:
 
-echo "Deploying Edge Functions..."
+jobs:
+  deploy:
+    name: Deploy Database & Edge Functions
+    runs-on: ubuntu-latest
 
-supabase functions deploy appointments
-supabase functions deploy stats
-supabase functions deploy admin-auth
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-echo "Done!"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Login to Supabase
+        run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
+
+      - name: Link Supabase Project
+        run: |
+          supabase link \
+            --project-ref "$SUPABASE_PROJECT_ID" \
+            --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply Database Migrations
+        run: supabase db push
+
+      - name: Deploy Edge Functions
+        run: |
+          supabase functions deploy appointments
+          supabase functions deploy stats
+          supabase functions deploy admin-auth
+
+      - name: Deployment Complete
+        run: echo "✅ Supabase deployment completed successfully!"
