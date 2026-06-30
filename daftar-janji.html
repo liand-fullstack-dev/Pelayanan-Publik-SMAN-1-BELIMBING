@@ -4,400 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Janji Temu - SMAN 1 BELIMBING</title>
+    <meta name="description" content="Daftar dan status janji temu kunjungan ke SMAN 1 Belimbing.">
+    <link rel="icon" href="/logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        .page-header {
-            padding-top: 120px;
-            padding-bottom: var(--space-8);
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-            color: white;
-        }
-
-        .page-header-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 var(--space-6);
-        }
-
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: var(--space-2);
-        }
-
-        .page-header p {
-            opacity: 0.9;
-            font-size: 1rem;
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: var(--space-4);
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: var(--space-6);
-            transform: translateY(-50%);
-        }
-
-        .stat-card {
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: var(--space-5);
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-            transition: all var(--transition-base);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .stat-card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto var(--space-3);
-            font-size: 1rem;
-        }
-
-        .stat-card-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--color-text);
-            line-height: 1;
-            margin-bottom: var(--space-1);
-        }
-
-        .stat-card-label {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: var(--color-text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .stat-card.total .stat-card-icon { background: var(--color-primary-50); color: var(--color-primary); }
-        .stat-card.today .stat-card-icon { background: var(--color-success-light); color: var(--color-success); }
-        .stat-card.week .stat-card-icon { background: var(--color-info-light, #e0e7ff); color: var(--color-info); }
-        .stat-card.month .stat-card-icon { background: var(--color-warning-light); color: var(--color-warning); }
-        .stat-card.done .stat-card-icon { background: #d1fae5; color: var(--color-success); }
-        .stat-card.waiting .stat-card-icon { background: var(--color-primary-50); color: var(--color-primary); }
-
-        .filter-bar {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: var(--space-6);
-            display: flex;
-            gap: var(--space-4);
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: var(--space-3);
-            flex-wrap: wrap;
-            flex: 1;
-        }
-
-        .filter-input {
-            padding: var(--space-3) var(--space-4);
-            border: 1.5px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-family: inherit;
-            background: var(--color-bg);
-            color: var(--color-text);
-            min-width: 180px;
-            transition: all var(--transition-fast);
-        }
-
-        .filter-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .filter-select {
-            padding: var(--space-3) var(--space-4);
-            border: 1.5px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-family: inherit;
-            background: var(--color-bg);
-            color: var(--color-text);
-            min-width: 160px;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        .appointments-grid {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 var(--space-6) var(--space-16);
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: var(--space-5);
-        }
-
-        .appointment-card-item {
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-6);
-            transition: all var(--transition-base);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .appointment-card-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-            transform: scaleX(0);
-            transition: transform var(--transition-base);
-        }
-
-        .appointment-card-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--color-primary-200);
-        }
-
-        .appointment-card-item:hover::before {
-            transform: scaleX(1);
-        }
-
-        .card-item-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-4);
-        }
-
-        .card-item-queue {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--color-primary);
-            letter-spacing: 0.05em;
-        }
-
-        .card-item-status {
-            padding: var(--space-1) var(--space-3);
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-waiting { background: var(--color-warning-light); color: var(--color-warning); }
-        .status-confirmed { background: var(--color-primary-50); color: var(--color-primary); }
-        .status-done { background: var(--color-success-light); color: var(--color-success); }
-        .status-cancelled { background: var(--color-danger-light); color: var(--color-danger); }
-
-        .card-item-body {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
-        }
-
-        .card-item-row {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-        }
-
-        .card-item-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--color-bg-secondary);
-            color: var(--color-text-tertiary);
-            font-size: 0.75rem;
-            flex-shrink: 0;
-        }
-
-        .card-item-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-item-label {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: var(--color-text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-item-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--color-text);
-        }
-
-        .card-item-footer {
-            margin-top: var(--space-4);
-            padding-top: var(--space-4);
-            border-top: 1px solid var(--color-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-item-time {
-            font-size: 0.75rem;
-            color: var(--color-text-tertiary);
-        }
-
-        .card-item-actions {
-            display: flex;
-            gap: var(--space-2);
-        }
-
-        .card-item-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--color-text-tertiary);
-            background: var(--color-bg-secondary);
-            transition: all var(--transition-fast);
-            font-size: 0.75rem;
-        }
-
-        .card-item-btn:hover {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: var(--space-20);
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            color: var(--color-text-muted);
-            margin-bottom: var(--space-4);
-            display: block;
-        }
-
-        .empty-state h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--color-text);
-            margin-bottom: var(--space-2);
-        }
-
-        .empty-state p {
-            color: var(--color-text-secondary);
-        }
-
-        .pagination {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 var(--space-6) var(--space-16);
-            display: flex;
-            justify-content: center;
-            gap: var(--space-2);
-        }
-
-        .page-btn {
-            min-width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--color-text-secondary);
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
-            transition: all var(--transition-fast);
-        }
-
-        .page-btn:hover {
-            border-color: var(--color-primary);
-            color: var(--color-primary);
-        }
-
-        .page-btn.active {
-            background: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        @media (max-width: 1024px) {
-            .stats-bar {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-bar {
-                grid-template-columns: repeat(2, 1fr);
-                transform: translateY(-30%);
-            }
-
-            .filter-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filter-group {
-                flex-direction: column;
-            }
-
-            .filter-input, .filter-select {
-                width: 100%;
-            }
-
-            .appointments-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="/" class="nav-logo">
-                <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="logo-img">
+                <div class="logo-icon">
+                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="logo-img">
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">SMAN 1 BELIMBING</span>
-                    <span class="logo-subtitle">Sistem Pelayanan Publik</span>
+                    <span class="logo-subtitle">Pelayanan Publik</span>
                 </div>
             </a>
             <div class="nav-right">
@@ -517,7 +142,7 @@
         <div class="footer-container">
             <div class="footer-brand">
                 <div class="footer-logo">
-                    <img src="/logo.svg" alt="Logo SMAN 1 Belimbing" class="footer-logo-img">
+                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="footer-logo-img">
                     <span>SMAN 1 BELIMBING</span>
                 </div>
                 <p class="footer-desc">Sistem Pelayanan Publik untuk memudahkan masyarakat dalam berkomunikasi dengan pihak sekolah.</p>
@@ -552,6 +177,19 @@
     <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
     <script src="/script.js"></script>
+    <script>
+        if (window.Lenis && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        }
+        if (window.gsap) {
+            gsap.from('.page-header h1, .page-header p', { opacity: 0, y: 16, duration: 0.6, stagger: 0.08, ease: 'power3.out' });
+            gsap.from('.stat-card', { opacity: 0, y: 16, duration: 0.5, stagger: 0.05, delay: 0.15, ease: 'power3.out' });
+        }
+    </script>
 </body>
 </html>
