@@ -1,195 +1,189 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Janji Temu - SMAN 1 BELIMBING</title>
-    <meta name="description" content="Daftar dan status janji temu kunjungan ke SMAN 1 Belimbing.">
-    <link rel="icon" href="/logo.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Daftar Janji Temu — Portal Pelayanan Digital SMAN 1 BELIMBING</title>
+  <meta name="description" content="Lihat daftar dan status janji temu di SMAN 1 Belimbing secara real-time.">
+  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="/" class="nav-logo">
-                <div class="logo-icon">
-                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="logo-img">
-                </div>
-                <div class="logo-text">
-                    <span class="logo-title">SMAN 1 BELIMBING</span>
-                    <span class="logo-subtitle">Pelayanan Publik</span>
-                </div>
-            </a>
-            <div class="nav-right">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
-                <button class="nav-toggle" id="navToggle" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-            <div class="nav-menu" id="navMenu">
-                <a href="/" class="nav-link">Beranda</a>
-                <a href="/#alur" class="nav-link">Alur</a>
-                <a href="/#faq" class="nav-link">FAQ</a>
-                <a href="/daftar-janji" class="nav-link">Daftar Janji</a>
-                <a href="/admin" class="nav-link nav-link-admin">Admin</a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="page-header-container">
-            <h1>Daftar Janji Temu</h1>
-            <p>Lihat dan cari janji temu yang telah diajukan</p>
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" id="navLogo">
+        <div class="logo-icon" id="navLogoIcon">
+          <img src="/logo.png" alt="Logo SMAN 1 BELIMBING" class="logo-img" loading="lazy">
+          <div class="logo-admin-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+          </div>
         </div>
-    </section>
-
-    <!-- Stats Bar -->
-    <div class="stats-bar" id="statsBar">
-        <div class="stat-card total">
-            <div class="stat-card-icon"><i class="fas fa-calendar-alt"></i></div>
-            <div class="stat-card-value" id="statTotal">0</div>
-            <div class="stat-card-label">Total</div>
+        <div class="logo-text">
+          <span class="logo-title">SMAN 1 BELIMBING</span>
+          <span class="logo-subtitle">Portal Pelayanan Digital</span>
         </div>
-        <div class="stat-card today">
-            <div class="stat-card-icon"><i class="fas fa-calendar-day"></i></div>
-            <div class="stat-card-value" id="statToday">0</div>
-            <div class="stat-card-label">Hari Ini</div>
-        </div>
-        <div class="stat-card week">
-            <div class="stat-card-icon"><i class="fas fa-calendar-week"></i></div>
-            <div class="stat-card-value" id="statWeek">0</div>
-            <div class="stat-card-label">Minggu Ini</div>
-        </div>
-        <div class="stat-card month">
-            <div class="stat-card-icon"><i class="fas fa-calendar"></i></div>
-            <div class="stat-card-value" id="statMonth">0</div>
-            <div class="stat-card-label">Bulan Ini</div>
-        </div>
-        <div class="stat-card done">
-            <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-card-value" id="statDone">0</div>
-            <div class="stat-card-label">Selesai</div>
-        </div>
-        <div class="stat-card waiting">
-            <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
-            <div class="stat-card-value" id="statWaiting">0</div>
-            <div class="stat-card-label">Menunggu</div>
-        </div>
+      </a>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="/"           class="nav-link">Beranda</a>
+        <a href="/#form-janji" class="nav-link">Buat Janji</a>
+        <a href="/daftar-janji" class="nav-link active">Daftar Janji</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Ganti tema">
+        <svg viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <button class="nav-toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </nav>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-        <div class="filter-group">
-            <input type="text" class="filter-input" id="filterSearch" placeholder="Cari nama atau nomor antrian...">
-            <input type="date" class="filter-input" id="filterDate">
-            <select class="filter-select" id="filterTujuan">
-                <option value="">Semua Tujuan</option>
-                <option value="Kepala Sekolah">Kepala Sekolah</option>
-                <option value="Wakil Kepala Sekolah">Wakil Kepala Sekolah</option>
-                <option value="Kepala Kurikulum">Kepala Kurikulum</option>
-                <option value="Guru BK">Guru BK</option>
-                <option value="Wali Kelas">Wali Kelas</option>
-                <option value="Guru Mata Pelajaran">Guru Mata Pelajaran</option>
-                <option value="Tata Usaha">Tata Usaha</option>
-                <option value="Bendahara">Bendahara</option>
-                <option value="Operator Sekolah">Operator Sekolah</option>
-                <option value="Komite Sekolah">Komite Sekolah</option>
-                <option value="Lainnya">Lainnya</option>
-            </select>
-            <select class="filter-select" id="filterStatus">
-                <option value="">Semua Status</option>
-                <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
-                <option value="Dikonfirmasi">Dikonfirmasi</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Dibatalkan">Dibatalkan</option>
-            </select>
-        </div>
-        <div class="filter-sort">
-            <select class="filter-select" id="filterSort">
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="date">Tanggal</option>
-                <option value="name">Nama</option>
-                <option value="queue">Nomor Antrian</option>
-            </select>
-        </div>
+  <div class="nav-mobile-menu" id="navMobileMenu">
+    <a href="/"           class="nav-mobile-link">Beranda</a>
+    <a href="/#form-janji" class="nav-mobile-link">Buat Janji</a>
+    <a href="/daftar-janji" class="nav-mobile-link">Daftar Janji</a>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="pageTop">
+    <div class="page-header-inner">
+      <p class="section-tag" style="margin-bottom:var(--sp-3)">Real-time Updates</p>
+      <h1>Daftar Janji Temu</h1>
+      <p>Pantau status antrian dan janji temu di SMAN 1 BELIMBING secara langsung</p>
     </div>
+  </div>
 
-    <!-- Appointments Grid -->
-    <div class="appointments-grid" id="appointmentsGrid">
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h3>Belum Ada Data</h3>
-            <p>Belum ada janji temu yang tercatat dalam sistem.</p>
-        </div>
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-bar-inner">
+      <div class="stat-card">
+        <div class="stat-card-value" id="sTotalAll">—</div>
+        <div class="stat-card-label">Total Janji</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" id="sTotalToday">—</div>
+        <div class="stat-card-label">Hari Ini</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" id="sTotalWaiting" style="color:var(--c-warning)">—</div>
+        <div class="stat-card-label">Menunggu</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" id="sTotalConfirmed" style="color:var(--c-electric)">—</div>
+        <div class="stat-card-label">Dikonfirmasi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" id="sTotalDone" style="color:var(--c-success)">—</div>
+        <div class="stat-card-label">Selesai</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" id="sWeek">—</div>
+        <div class="stat-card-label">Minggu Ini</div>
+      </div>
     </div>
+  </div>
 
-    <!-- Pagination -->
-    <div class="pagination" id="pagination"></div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <div class="footer-logo">
-                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="footer-logo-img">
-                    <span>SMAN 1 BELIMBING</span>
-                </div>
-                <p class="footer-desc">Sistem Pelayanan Publik untuk memudahkan masyarakat dalam berkomunikasi dengan pihak sekolah.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <h4>Navigasi</h4>
-                    <a href="/">Beranda</a>
-                    <a href="/#alur">Alur</a>
-                    <a href="/#faq">FAQ</a>
-                    <a href="/daftar-janji">Daftar Janji</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Layanan</h4>
-                    <a href="/#form-janji">Buat Janji</a>
-                    <a href="/daftar-janji">Cek Status</a>
-                    <a href="/admin">Dashboard Admin</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Kontak</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Jl. Pendidikan No. 1, Belimbing</p>
-                    <p><i class="fas fa-phone"></i> (0341) 123456</p>
-                    <p><i class="fas fa-envelope"></i> info@sman1belimbing.sch.id</p>
-                </div>
-            </div>
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-bar-inner">
+      <div class="filter-group">
+        <div style="position:relative;flex:1;min-width:200px">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--c-text-3)" fill="none" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Cari nama, nomor antrian..." class="filter-input" style="padding-left:38px;width:100%">
         </div>
-        <div class="footer-bottom">
-            <p>SMAN 1 BELIMBING. Sistem Pelayanan Publik.</p>
+        <select id="statusFilter" class="filter-select" style="width:auto">
+          <option value="">Semua Status</option>
+          <option value="Menunggu Konfirmasi">Menunggu</option>
+          <option value="Dikonfirmasi">Dikonfirmasi</option>
+          <option value="Selesai">Selesai</option>
+          <option value="Dibatalkan">Dibatalkan</option>
+        </select>
+        <select id="tujuanFilter" class="filter-select" style="width:auto">
+          <option value="">Semua Tujuan</option>
+          <option value="Kepala Sekolah">Kepala Sekolah</option>
+          <option value="Wakil Kepala Sekolah">Wakil Kepala Sekolah</option>
+          <option value="Kepala Kurikulum">Kepala Kurikulum</option>
+          <option value="Guru BK">Guru BK</option>
+          <option value="Wali Kelas">Wali Kelas</option>
+          <option value="Guru Mata Pelajaran">Guru Mata Pelajaran</option>
+          <option value="Tata Usaha">Tata Usaha</option>
+          <option value="Bendahara">Bendahara</option>
+        </select>
+        <input type="date" id="dateFilter" class="filter-select" style="width:auto" title="Filter tanggal">
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-3)">
+        <span class="rt-badge" id="rtIndicator">
+          <span class="rt-dot"></span> Live
+        </span>
+        <button class="btn btn-ghost btn-sm" id="resetFilter">Reset</button>
+        <a href="/#form-janji" class="btn btn-primary btn-sm">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Buat Janji
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENTS -->
+  <main>
+    <div class="appointments-wrap">
+      <div class="appointments-grid" id="appointmentsGrid">
+        <!-- Skeleton loading -->
+        <div class="apt-card" style="opacity:.4;animation:shimmer 1.5s ease-in-out infinite">
+          <div class="apt-card-head"><div style="width:80px;height:16px;background:var(--c-border);border-radius:var(--r-sm)"></div></div>
+          <div class="apt-card-body">
+            <div style="width:60%;height:14px;background:var(--c-border);border-radius:var(--r-sm)"></div>
+            <div style="width:80%;height:14px;background:var(--c-border);border-radius:var(--r-sm)"></div>
+          </div>
         </div>
-    </footer>
+        <div class="apt-card" style="opacity:.25;animation:shimmer 1.5s ease-in-out .2s infinite">
+          <div class="apt-card-head"><div style="width:80px;height:16px;background:var(--c-border);border-radius:var(--r-sm)"></div></div>
+          <div class="apt-card-body">
+            <div style="width:60%;height:14px;background:var(--c-border);border-radius:var(--r-sm)"></div>
+            <div style="width:80%;height:14px;background:var(--c-border);border-radius:var(--r-sm)"></div>
+          </div>
+        </div>
+        <div class="apt-card" style="opacity:.15;animation:shimmer 1.5s ease-in-out .4s infinite">
+          <div class="apt-card-head"><div style="width:80px;height:16px;background:var(--c-border);border-radius:var(--r-sm)"></div></div>
+          <div class="apt-card-body">
+            <div style="width:60%;height:14px;background:var(--c-border);border-radius:var(--r-sm)"></div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Toast -->
-    <div class="toast-container" id="toastContainer"></div>
+      <!-- Pagination -->
+      <div class="pagination" id="paginationBar"></div>
+    </div>
+  </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-    <script src="/script.js"></script>
-    <script>
-        if (window.Lenis && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
-            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-            requestAnimationFrame(raf);
-        }
-        if (window.gsap) {
-            gsap.from('.page-header h1, .page-header p', { opacity: 0, y: 16, duration: 0.6, stagger: 0.08, ease: 'power3.out' });
-            gsap.from('.stat-card', { opacity: 0, y: 16, duration: 0.5, stagger: 0.05, delay: 0.15, ease: 'power3.out' });
-        }
-    </script>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-bottom" style="padding:var(--sp-8) clamp(var(--sp-6),5vw,var(--sp-8))">
+      <p>&copy; 2026 SMAN 1 BELIMBING — Portal Pelayanan Digital</p>
+      <a href="/" style="color:rgba(255,255,255,.4);font-size:.8125rem">Kembali ke Beranda</a>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <style>
+  @keyframes shimmer {
+    0%,100%{opacity:var(--base-opacity,0.4)}
+    50%{opacity:0.6}
+  }
+  </style>
+  <script src="/script.js" defer></script>
+  <script>window.__DAFTAR_PAGE__ = true;</script>
 </body>
 </html>
