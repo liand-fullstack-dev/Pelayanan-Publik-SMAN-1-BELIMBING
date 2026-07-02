@@ -1,14 +1,22 @@
 {
-  "name": "pelayanan-publik-sman-1-belimbing",
-  "version": "1.0.0",
+  "name": "portal-pelayanan-digital-sman1-belimbing",
+  "version": "3.0.0",
+  "description": "Portal Pelayanan Digital SMAN 1 BELIMBING — Sistem manajemen janji temu dan antrian digital",
   "private": true,
-  "description": "Sistem Pelayanan Publik SMAN 1 BELIMBING - static frontend (Vercel) + Supabase backend",
   "scripts": {
-    "build": "echo 'Static site, tidak ada proses build yang diperlukan.'",
-    "dev": "npx serve .",
-    "start": "npx serve ."
+    "dev": "npx serve . -p 3000 --cors",
+    "deploy": "vercel --prod",
+    "supabase:start": "supabase start",
+    "supabase:migrate": "supabase db push",
+    "supabase:functions": "supabase functions deploy",
+    "supabase:deploy-all": "supabase functions deploy admin-auth && supabase functions deploy appointments && supabase functions deploy whatsapp-send && supabase functions deploy stats && supabase functions deploy reports",
+    "test": "node tests/run.js"
   },
-  "engines": {
-    "node": ">=18"
+  "keywords": ["sman1belimbing", "portal", "pelayanan-publik", "janji-temu", "antrian-digital"],
+  "author": "SMAN 1 BELIMBING",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1",
+    "vercel": "^32.0.0"
   }
 }
