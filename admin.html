@@ -1,266 +1,572 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - SMAN 1 BELIMBING</title>
-    <link rel="icon" href="/logo.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
-    <style>
-        .admin-layout { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 260px; background: var(--color-secondary); color: white; position: fixed; top: 0; left: 0; bottom: 0; z-index: var(--z-sticky); display: flex; flex-direction: column; transition: transform var(--transition-base); }
-        .admin-sidebar-header { padding: var(--space-6); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .admin-sidebar-logo { display: flex; align-items: center; gap: var(--space-3); }
-        .admin-sidebar-logo img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
-        .admin-sidebar-logo span { font-family: var(--font-sans); font-weight: 700; font-size: 0.8125rem; letter-spacing: -0.01em; }
-        .admin-sidebar-nav { flex: 1; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
-        .admin-sidebar-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); color: rgba(255,255,255,0.7); font-size: 0.875rem; font-weight: 500; transition: all var(--transition-fast); }
-        .admin-sidebar-link:hover, .admin-sidebar-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .admin-sidebar-link i { width: 20px; text-align: center; }
-        .admin-sidebar-footer { padding: var(--space-4); border-top: 1px solid rgba(255,255,255,0.1); }
-        .admin-user { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: rgba(255,255,255,0.05); border-radius: var(--radius-lg); }
-        .admin-user-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; }
-        .admin-user-info { flex: 1; }
-        .admin-user-name { font-size: 0.875rem; font-weight: 600; color: white; }
-        .admin-user-role { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
-        .admin-main { flex: 1; margin-left: 260px; background: var(--color-bg-secondary); min-height: 100vh; }
-        .admin-header { background: var(--color-bg); border-bottom: 1px solid var(--color-border); padding: var(--space-4) var(--space-8); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .admin-header h1 { font-family: var(--font-sans); font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.015em; }
-        .admin-header-actions { display: flex; gap: var(--space-3); align-items: center; }
-        .admin-content { padding: var(--space-8); }
-        .dashboard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); margin-bottom: var(--space-8); }
-        .dashboard-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); transition: all var(--transition-base); }
-        .dashboard-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-        .dashboard-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
-        .dashboard-card-icon { width: 48px; height: 48px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-        .dashboard-card-icon.blue { background: var(--color-primary-50); color: var(--color-primary); }
-        .dashboard-card-icon.green { background: var(--color-success-light); color: var(--color-success); }
-        .dashboard-card-icon.orange { background: var(--color-warning-light); color: var(--color-warning); }
-        .dashboard-card-icon.red { background: var(--color-danger-light); color: var(--color-danger); }
-        .dashboard-card-trend { font-size: 0.75rem; font-weight: 600; padding: var(--space-1) var(--space-2); border-radius: var(--radius-md); }
-        .dashboard-card-value { font-family: var(--font-display); font-size: 1.875rem; font-weight: 500; color: var(--color-text); line-height: 1; margin-bottom: var(--space-2); }
-        .dashboard-card-label { font-size: 0.875rem; color: var(--color-text-secondary); }
-        .dashboard-section { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); margin-bottom: var(--space-6); }
-        .dashboard-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3); }
-        .dashboard-section-title { font-family: var(--font-sans); font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.01em; }
-        .dashboard-table { width: 100%; border-collapse: collapse; }
-        .dashboard-table th { text-align: left; padding: var(--space-3) var(--space-4); font-size: 0.75rem; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
-        .dashboard-table td { padding: var(--space-4); font-size: 0.875rem; border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
-        .dashboard-table tr:hover td { background: var(--color-bg-secondary); }
-        .dashboard-table tr:last-child td { border-bottom: none; }
-        .table-status { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; }
-        .table-actions { display: flex; gap: var(--space-2); }
-        .table-action-btn { width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); background: var(--color-bg-secondary); transition: all var(--transition-fast); font-size: 0.75rem; border: none; cursor: pointer; }
-        .table-action-btn:hover { background: var(--color-primary); color: white; }
-        .table-action-btn.danger:hover { background: var(--color-danger); }
-        .table-action-btn.success:hover { background: var(--color-success); }
-        .chart-container { height: 300px; position: relative; }
-        .chart-bar { display: flex; align-items: flex-end; justify-content: space-around; height: 100%; padding: var(--space-4) 0; }
-        .chart-bar-item { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); flex: 1; }
-        .chart-bar-fill { width: 32px; background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); border-radius: var(--radius-md) var(--radius-md) 0 0; transition: height 1s ease-out; min-height: 4px; }
-        .chart-bar-label { font-size: 0.75rem; color: var(--color-text-tertiary); font-weight: 500; }
-        .chart-bar-value { font-size: 0.75rem; font-weight: 700; color: var(--color-text); }
-        .admin-sidebar-toggle { display: none; width: 40px; height: 40px; align-items: center; justify-content: center; color: var(--color-text); font-size: 1.25rem; background: none; border: none; cursor: pointer; }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
-        .sidebar-overlay.active { display: block; }
-        .status-waiting { background: var(--color-warning-light); color: var(--color-warning); }
-        .status-confirmed { background: var(--color-primary-50); color: var(--color-primary); }
-        .status-done { background: var(--color-success-light); color: var(--color-success); }
-        .status-cancelled { background: var(--color-danger-light); color: var(--color-danger); }
-        .filter-select { padding: var(--space-3) var(--space-4); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); font-size: 0.875rem; font-family: inherit; background: var(--color-bg); color: var(--color-text); min-width: 160px; cursor: pointer; transition: all var(--transition-fast); }
-        .filter-select:focus { outline: none; border-color: var(--color-primary); }
-        .filter-input { padding: var(--space-3) var(--space-4); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); font-size: 0.875rem; font-family: inherit; background: var(--color-bg); color: var(--color-text); min-width: 180px; transition: all var(--transition-fast); }
-        .filter-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .page-btn { min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 600; color: var(--color-text-secondary); background: var(--color-bg-elevated); border: 1px solid var(--color-border); transition: all var(--transition-fast); cursor: pointer; }
-        .page-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
-        .page-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .pagination { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-6); }
-        .btn-sm { padding: var(--space-2) var(--space-3); font-size: 0.75rem; border-radius: var(--radius-md); }
-        .btn-logout { background: var(--color-danger-light); color: var(--color-danger); border: 1px solid var(--color-danger-light); }
-        .btn-logout:hover { background: var(--color-danger); color: white; }
-        @media (max-width: 1024px) {
-            .admin-sidebar { transform: translateX(-100%); }
-            .admin-sidebar.open { transform: translateX(0); }
-            .admin-main { margin-left: 0; }
-            .admin-sidebar-toggle { display: flex; }
-            .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
-            .dashboard-table { display: block; overflow-x: auto; }
-        }
-        @media (max-width: 768px) {
-            .dashboard-stats { grid-template-columns: 1fr; }
-            .admin-content { padding: var(--space-4); }
-            .admin-header { padding: var(--space-4); }
-            .dashboard-section-header { flex-direction: column; align-items: flex-start; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin — Portal Pelayanan Digital SMAN 1 BELIMBING</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 </head>
 <body>
-    <div class="admin-layout">
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="admin-sidebar-header">
-                <div class="admin-sidebar-logo">
-                    <div class="logo-icon" style="width:36px;height:36px;">
-                        <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="sidebar-logo-img" style="width:100%;height:100%;">
-                    </div>
-                    <span>SMAN 1 BELIMBING</span>
-                </div>
-            </div>
-            <nav class="admin-sidebar-nav">
-                <a href="#" class="admin-sidebar-link active" data-page="dashboard">
-                    <i class="fas fa-chart-line"></i><span>Dashboard</span>
-                </a>
-                <a href="#" class="admin-sidebar-link" data-page="appointments">
-                    <i class="fas fa-calendar-check"></i><span>Janji Temu</span>
-                </a>
-                <a href="#" class="admin-sidebar-link" data-page="users">
-                    <i class="fas fa-users"></i><span>Pengguna</span>
-                </a>
-                <a href="#" class="admin-sidebar-link" data-page="logs">
-                    <i class="fas fa-history"></i><span>Log Aktivitas</span>
-                </a>
-                <a href="/" class="admin-sidebar-link">
-                    <i class="fas fa-arrow-left"></i><span>Kembali ke Website</span>
-                </a>
-            </nav>
-            <div class="admin-sidebar-footer">
-                <div class="admin-user">
-                    <div class="admin-user-avatar">A</div>
-                    <div class="admin-user-info">
-                        <div class="admin-user-name">Admin</div>
-                        <div class="admin-user-role">Administrator</div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-        <main class="admin-main">
-            <header class="admin-header">
-                <div style="display: flex; align-items: center; gap: var(--space-3);">
-                    <button class="admin-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1>Dashboard Admin</h1>
-                </div>
-                <div class="admin-header-actions">
-                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
-                    <button class="btn btn-logout btn-sm" id="adminLogout" title="Keluar">
-                        <i class="fas fa-sign-out-alt"></i><span>Keluar</span>
-                    </button>
-                </div>
-            </header>
-            <div class="admin-content">
-                <div class="dashboard-stats">
-                    <div class="dashboard-card">
-                        <div class="dashboard-card-header">
-                            <div class="dashboard-card-icon blue"><i class="fas fa-calendar-alt"></i></div>
-                            <span class="dashboard-card-trend" style="background: var(--color-success-light); color: var(--color-success);">+12%</span>
-                        </div>
-                        <div class="dashboard-card-value" id="dashTotal">0</div>
-                        <div class="dashboard-card-label">Total Janji Temu</div>
-                    </div>
-                    <div class="dashboard-card">
-                        <div class="dashboard-card-header">
-                            <div class="dashboard-card-icon green"><i class="fas fa-check-circle"></i></div>
-                            <span class="dashboard-card-trend" style="background: var(--color-success-light); color: var(--color-success);">+5%</span>
-                        </div>
-                        <div class="dashboard-card-value" id="dashDone">0</div>
-                        <div class="dashboard-card-label">Selesai</div>
-                    </div>
-                    <div class="dashboard-card">
-                        <div class="dashboard-card-header">
-                            <div class="dashboard-card-icon orange"><i class="fas fa-clock"></i></div>
-                            <span class="dashboard-card-trend" style="background: var(--color-warning-light); color: var(--color-warning);">+8%</span>
-                        </div>
-                        <div class="dashboard-card-value" id="dashWaiting">0</div>
-                        <div class="dashboard-card-label">Menunggu</div>
-                    </div>
-                    <div class="dashboard-card">
-                        <div class="dashboard-card-header">
-                            <div class="dashboard-card-icon red"><i class="fas fa-calendar-day"></i></div>
-                            <span class="dashboard-card-trend" style="background: var(--color-primary-50); color: var(--color-primary);">Hari Ini</span>
-                        </div>
-                        <div class="dashboard-card-value" id="dashToday">0</div>
-                        <div class="dashboard-card-label">Janji Hari Ini</div>
-                    </div>
-                </div>
-                <div class="dashboard-section">
-                    <div class="dashboard-section-header">
-                        <h2 class="dashboard-section-title">Grafik Kunjungan</h2>
-                        <select class="filter-select" id="chartPeriod" style="min-width: 120px;">
-                            <option value="7">7 Hari Terakhir</option>
-                            <option value="30">30 Hari Terakhir</option>
-                        </select>
-                    </div>
-                    <div class="chart-container" id="chartContainer">
-                        <div class="chart-bar" id="chartBar"></div>
-                    </div>
-                </div>
-                <div class="dashboard-section">
-                    <div class="dashboard-section-header">
-                        <h2 class="dashboard-section-title">Daftar Janji Temu</h2>
-                        <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
-                            <input type="text" class="filter-input" id="adminSearch" placeholder="Cari..." style="min-width: 200px;">
-                            <button class="btn btn-primary btn-sm" onclick="AdminPage.exportData('excel')">
-                                <i class="fas fa-file-excel"></i><span>Excel</span>
-                            </button>
-                            <button class="btn btn-outline btn-sm" onclick="AdminPage.exportData('pdf')">
-                                <i class="fas fa-file-pdf"></i><span>PDF</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Nomor</th>
-                                    <th>Nama</th>
-                                    <th>Tujuan</th>
-                                    <th>Tanggal</th>
-                                    <th>Jam</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminTableBody">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: var(--space-10);">
-                                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--color-primary); margin-bottom: var(--space-3); display: block;"></i>
-                                        Memuat data...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination" id="adminPagination"></div>
-                </div>
-            </div>
-        </main>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen" style="display:none">
+  <div class="login-card">
+    <div class="login-logo-section">
+      <div class="login-logo-icon">
+        <img src="/logo.png" alt="Logo SMAN 1 BELIMBING">
+      </div>
+      <h1 class="login-title">Admin Panel</h1>
+      <p class="login-sub">Portal Pelayanan Digital SMAN 1 BELIMBING</p>
     </div>
-    <div class="toast-container" id="toastContainer"></div>
-    <div class="modal-overlay hidden" id="modalOverlay">
-        <div class="modal" id="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Judul</h3>
-                <button class="modal-close" id="modalClose" aria-label="Tutup"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-footer" id="modalFooter"></div>
+    <div class="login-form" id="loginForm">
+      <div class="form-field">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="Username admin" autofocus>
+        <span class="field-error" id="loginUsernameErr" role="alert"></span>
+      </div>
+      <div class="form-field">
+        <label for="loginPassword">Password</label>
+        <div class="pw-wrapper">
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Password admin">
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Tampilkan password">
+            <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
         </div>
+        <span class="field-error" id="loginPasswordErr" role="alert"></span>
+      </div>
+      <div class="login-attempts hidden" id="loginAttemptsWarn"></div>
+      <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;padding:var(--sp-4)">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        <span id="loginBtnText">Masuk</span>
+      </button>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="/script.js"></script>
-    <script>
-        if (window.gsap) {
-            gsap.from('.dashboard-card', { opacity: 0, y: 14, duration: 0.5, stagger: 0.06, ease: 'power3.out' });
-        }
-    </script>
+    <div class="login-back">
+      <a href="/">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Kembali ke Portal
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminDashboard" class="admin-layout" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar" role="navigation" aria-label="Navigasi admin">
+    <div class="admin-sidebar-header">
+      <a href="/" class="admin-brand" title="Kembali ke Portal">
+        <div class="admin-brand-logo">
+          <img src="/logo.png" alt="Logo SMAN 1 BELIMBING">
+        </div>
+        <div class="admin-brand-text">
+          <span class="admin-brand-name">SMAN 1 BELIMBING</span>
+          <span class="admin-brand-sub">Admin Panel</span>
+        </div>
+      </a>
+    </div>
+
+    <nav class="admin-sidebar-nav">
+      <span class="admin-nav-section">Utama</span>
+      <a class="admin-nav-link active" data-tab="dashboard" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="admin-nav-link" data-tab="appointments" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Daftar Janji
+        <span class="badge badge-waiting" id="sidebarBadge" style="margin-left:auto"></span>
+      </a>
+      <span class="admin-nav-section">Laporan</span>
+      <a class="admin-nav-link" data-tab="reports" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Laporan & Unduh
+      </a>
+      <span class="admin-nav-section">Pengaturan</span>
+      <a class="admin-nav-link" data-tab="settings" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Pengaturan
+      </a>
+      <a class="admin-nav-link" data-tab="password" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Ganti Password
+      </a>
+      <a class="admin-nav-link" data-tab="logs" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Log Aktivitas
+      </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <div class="admin-user">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-user-name" id="adminUsername">Admin</div>
+          <div class="admin-user-role">Super Admin</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn" style="width:100%;justify-content:center;margin-top:var(--sp-3)">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main content -->
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <button class="admin-sidebar-toggle" id="sidebarToggle" aria-label="Buka sidebar">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="admin-header-title" id="adminPageTitle">Dashboard</h1>
+      </div>
+      <div class="admin-header-right">
+        <span class="rt-badge" id="rtBadge" title="Realtime aktif">
+          <span class="rt-dot"></span> Live
+        </span>
+        <button class="theme-toggle" id="adminThemeToggle" aria-label="Ganti tema" title="Ganti tema">
+          <svg viewBox="0 0 24 24" id="adminThemeIcon">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+        <a href="/" class="btn btn-ghost btn-sm" title="Ke portal">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Portal
+        </a>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ── TAB: DASHBOARD ── -->
+      <div id="tab-dashboard" class="admin-tab">
+        <div class="dash-stats" id="dashStats">
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-icon blue"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+            </div>
+            <div class="dash-card-value" id="dStatTotal">—</div>
+            <div class="dash-card-label">Total Semua Janji</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            </div>
+            <div class="dash-card-value" id="dStatWaiting">—</div>
+            <div class="dash-card-label">Menunggu Konfirmasi</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-icon blue"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            </div>
+            <div class="dash-card-value" id="dStatConfirmed">—</div>
+            <div class="dash-card-label">Dikonfirmasi</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-head">
+              <div class="dash-card-icon green"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+            <div class="dash-card-value" id="dStatDone">—</div>
+            <div class="dash-card-label">Selesai</div>
+          </div>
+        </div>
+
+        <!-- Chart + Today -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--sp-6);margin-bottom:var(--sp-6)">
+          <div class="dash-section">
+            <div class="dash-section-header">
+              <h2 class="dash-section-title">Janji Temu (30 Hari)</h2>
+              <span class="rt-badge" style="font-size:.6875rem"><span class="rt-dot"></span>Realtime</span>
+            </div>
+            <div class="chart-wrap"><div class="chart-bars" id="dashChart"></div></div>
+          </div>
+          <div class="dash-section">
+            <div class="dash-section-header"><h2 class="dash-section-title">Hari Ini</h2></div>
+            <div style="padding:var(--sp-5) var(--sp-6)">
+              <div style="text-align:center;margin-bottom:var(--sp-5)">
+                <div class="dash-card-value" id="dStatToday" style="font-size:3rem">—</div>
+                <div class="dash-card-label">Janji Aktif Hari Ini</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--c-bg);border-radius:var(--r-lg)">
+                  <span style="font-size:.875rem;color:var(--c-text-2)">Minggu ini</span>
+                  <span class="dash-card-value" id="dStatWeek" style="font-size:1.2rem">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--c-bg);border-radius:var(--r-lg)">
+                  <span style="font-size:.875rem;color:var(--c-text-2)">Bulan ini</span>
+                  <span class="dash-card-value" id="dStatMonth" style="font-size:1.2rem">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Appointments on Dashboard -->
+        <div class="dash-section">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Janji Terbaru</h2>
+            <button class="btn btn-ghost btn-sm" data-tab="appointments" onclick="switchTab('appointments')">Lihat Semua</button>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table" id="dashRecentTable">
+              <thead>
+                <tr>
+                  <th>No. Antrian</th>
+                  <th>Nama</th>
+                  <th>WhatsApp</th>
+                  <th>Tujuan</th>
+                  <th>Tanggal</th>
+                  <th>Jam</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentBody">
+                <tr><td colspan="8" style="text-align:center;color:var(--c-text-3);padding:var(--sp-8)">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: APPOINTMENTS ── -->
+      <div id="tab-appointments" class="admin-tab" style="display:none">
+        <div class="dash-section">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Semua Janji Temu</h2>
+            <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+              <input type="text" id="aptSearch" placeholder="Cari nama, nomor, keperluan..." class="filter-input" style="min-width:220px">
+              <select id="aptFilterStatus" class="filter-select" style="width:auto">
+                <option value="">Semua Status</option>
+                <option value="Menunggu Konfirmasi">Menunggu</option>
+                <option value="Dikonfirmasi">Dikonfirmasi</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Dibatalkan">Dibatalkan</option>
+              </select>
+              <select id="aptFilterTujuan" class="filter-select" style="width:auto">
+                <option value="">Semua Tujuan</option>
+                <option value="Kepala Sekolah">Kepala Sekolah</option>
+                <option value="Wakil Kepala Sekolah">Wakil Kepala Sekolah</option>
+                <option value="Kepala Kurikulum">Kepala Kurikulum</option>
+                <option value="Guru BK">Guru BK</option>
+                <option value="Wali Kelas">Wali Kelas</option>
+                <option value="Guru Mata Pelajaran">Guru Mata Pelajaran</option>
+                <option value="Tata Usaha">Tata Usaha</option>
+                <option value="Bendahara">Bendahara</option>
+                <option value="Operator Sekolah">Operator Sekolah</option>
+                <option value="Komite Sekolah">Komite Sekolah</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              <input type="date" id="aptFilterDate" class="filter-select" style="width:auto" title="Filter tanggal">
+              <button class="btn btn-ghost btn-sm" id="aptFilterReset">Reset</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table" id="aptTable">
+              <thead>
+                <tr>
+                  <th>No. Antrian</th>
+                  <th>Nama Lengkap</th>
+                  <th>WhatsApp</th>
+                  <th>Instansi</th>
+                  <th>Tujuan Bertemu</th>
+                  <th>Keperluan</th>
+                  <th>Tanggal</th>
+                  <th>Jam</th>
+                  <th>Dokumen</th>
+                  <th>Status</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="aptTableBody">
+                <tr><td colspan="12" style="text-align:center;color:var(--c-text-3);padding:var(--sp-8)">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--c-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-3)">
+            <span id="aptCount" style="font-size:.875rem;color:var(--c-text-3)">— janji</span>
+            <div class="pagination" id="aptPagination" style="padding:0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: REPORTS ── -->
+      <div id="tab-reports" class="admin-tab" style="display:none">
+        <div class="dash-section" style="margin-bottom:var(--sp-6)">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Laporan Janji Temu</h2>
+          </div>
+          <div style="padding:var(--sp-6)">
+            <div class="report-period" style="margin-bottom:var(--sp-6)">
+              <label style="font-size:.875rem;font-weight:600;color:var(--c-text-2)">Periode:</label>
+              <button class="btn btn-ghost btn-sm report-period-btn active" data-period="week">Minggu Ini</button>
+              <button class="btn btn-ghost btn-sm report-period-btn" data-period="month">Bulan Ini</button>
+              <button class="btn btn-ghost btn-sm report-period-btn" data-period="custom">Kustom</button>
+              <div id="customDateRange" style="display:none;align-items:center;gap:var(--sp-2)">
+                <input type="date" id="reportStart" class="filter-select" style="width:auto">
+                <span style="color:var(--c-text-3)">s/d</span>
+                <input type="date" id="reportEnd" class="filter-select" style="width:auto">
+                <button class="btn btn-primary btn-sm" id="btnApplyCustom">Terapkan</button>
+              </div>
+            </div>
+
+            <div class="report-summary" id="reportSummary">
+              <div class="report-stat"><div class="report-stat-value" id="rs-total">—</div><div class="report-stat-label">Total</div></div>
+              <div class="report-stat"><div class="report-stat-value" id="rs-selesai" style="color:var(--c-success)">—</div><div class="report-stat-label">Selesai</div></div>
+              <div class="report-stat"><div class="report-stat-value" id="rs-konfirmasi" style="color:var(--c-electric)">—</div><div class="report-stat-label">Dikonfirmasi</div></div>
+              <div class="report-stat"><div class="report-stat-value" id="rs-menunggu" style="color:var(--c-warning)">—</div><div class="report-stat-label">Menunggu</div></div>
+              <div class="report-stat"><div class="report-stat-value" id="rs-batal" style="color:var(--c-danger)">—</div><div class="report-stat-label">Dibatalkan</div></div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-5)">
+              <button class="btn btn-primary btn-sm" id="btnDownloadExcel">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Unduh Excel (.xlsx)
+              </button>
+              <button class="btn btn-outline btn-sm" id="btnDownloadCSV">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Unduh CSV
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btnPrintReport">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Cetak
+              </button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="admin-table" id="reportTable">
+                <thead>
+                  <tr>
+                    <th>No. Antrian</th>
+                    <th>Nama</th>
+                    <th>WhatsApp</th>
+                    <th>Instansi</th>
+                    <th>Tujuan</th>
+                    <th>Keperluan</th>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>Status</th>
+                    <th>Diajukan</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                  <tr><td colspan="10" style="text-align:center;color:var(--c-text-3);padding:var(--sp-8)">Pilih periode untuk memuat laporan</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: SETTINGS ── -->
+      <div id="tab-settings" class="admin-tab" style="display:none">
+        <!-- WhatsApp API Settings -->
+        <div class="dash-section" style="margin-bottom:var(--sp-6)">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" style="vertical-align:middle;margin-right:8px"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.5 19.79 19.79 0 01.01 6 2 2 0 012 4h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 11a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              Konfigurasi WhatsApp API
+            </h2>
+          </div>
+          <div style="padding:var(--sp-6)">
+            <div class="settings-grid">
+              <div class="settings-field">
+                <label for="settingApiKey">API Key (FullStackNotes)</label>
+                <input type="text" id="settingApiKey" placeholder="fsk_live_xxxxxxxxxx" autocomplete="off">
+                <p class="hint">Didapat dari dashboard fullstacknotes.org</p>
+              </div>
+              <div class="settings-field">
+                <label for="settingSessionId">Session ID WhatsApp</label>
+                <input type="text" id="settingSessionId" placeholder="ses_xxxxxxxx" autocomplete="off">
+                <p class="hint">Session ID dari perangkat WA yang aktif</p>
+              </div>
+              <div class="settings-field" style="grid-column:1/-1">
+                <label for="settingDefaultNumber">Nomor Fallback (format 628xxx)</label>
+                <input type="tel" id="settingDefaultNumber" placeholder="6282382734762">
+                <p class="hint">Nomor WA yang digunakan jika tujuan tidak memiliki nomor spesifik</p>
+              </div>
+            </div>
+            <div style="margin-top:var(--sp-5);display:flex;gap:var(--sp-3)">
+              <button class="btn btn-primary btn-sm" id="btnSaveWAConfig">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Simpan Konfigurasi
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btnTestWA">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07"/></svg>
+                Test Kirim
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Targets per Role -->
+        <div class="dash-section">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Nomor WhatsApp Per Tujuan</h2>
+            <p style="font-size:.8125rem;color:var(--c-text-3)">Setiap tujuan akan mendapat notifikasi ke nomor yang berbeda</p>
+          </div>
+          <div style="padding:var(--sp-6)">
+            <div class="table-wrap">
+              <table class="wa-targets-table" id="waTargetsTable">
+                <thead>
+                  <tr>
+                    <th>Tujuan / Jabatan</th>
+                    <th>Nomor WhatsApp (format 628xxx)</th>
+                    <th>Aktif</th>
+                  </tr>
+                </thead>
+                <tbody id="waTargetsBody">
+                  <tr><td colspan="3" style="text-align:center;color:var(--c-text-3)">Memuat...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:var(--sp-5)">
+              <button class="btn btn-primary btn-sm" id="btnSaveTargets">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Simpan Semua Nomor
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: PASSWORD ── -->
+      <div id="tab-password" class="admin-tab" style="display:none">
+        <div class="dash-section" style="max-width:480px">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Ganti Password Admin</h2>
+          </div>
+          <div style="padding:var(--sp-6)">
+            <div class="reset-form" id="resetForm">
+              <div class="form-field">
+                <label for="currentPassword">Password Saat Ini</label>
+                <div class="pw-wrapper">
+                  <input type="password" id="currentPassword" autocomplete="current-password" placeholder="Masukkan password saat ini">
+                  <button type="button" class="pw-toggle" data-target="currentPassword" aria-label="Tampilkan password">
+                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <span class="field-error" id="err-currentPassword" role="alert"></span>
+              </div>
+              <div class="form-field">
+                <label for="newPassword">Password Baru</label>
+                <div class="pw-wrapper">
+                  <input type="password" id="newPassword" autocomplete="new-password" placeholder="Minimal 8 karakter">
+                  <button type="button" class="pw-toggle" data-target="newPassword" aria-label="Tampilkan password">
+                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <span class="field-error" id="err-newPassword" role="alert"></span>
+              </div>
+              <div class="form-field">
+                <label for="confirmPassword">Konfirmasi Password Baru</label>
+                <div class="pw-wrapper">
+                  <input type="password" id="confirmPassword" autocomplete="new-password" placeholder="Ulangi password baru">
+                  <button type="button" class="pw-toggle" data-target="confirmPassword" aria-label="Tampilkan password">
+                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <span class="field-error" id="err-confirmPassword" role="alert"></span>
+              </div>
+              <!-- Password strength -->
+              <div id="pwStrengthWrap" style="display:none">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:.75rem;color:var(--c-text-3)">Kekuatan password</span>
+                  <span style="font-size:.75rem;font-weight:700" id="pwStrengthLabel"></span>
+                </div>
+                <div style="height:4px;background:var(--c-bg);border-radius:2px;overflow:hidden">
+                  <div id="pwStrengthBar" style="height:100%;border-radius:2px;transition:width .3s,background .3s;width:0%"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:var(--sp-3)">
+                <button class="btn btn-primary" id="btnResetPassword">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                  <span id="resetBtnText">Simpan Password</span>
+                </button>
+                <button class="btn btn-ghost" id="btnResetClear">Batal</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: LOGS ── -->
+      <div id="tab-logs" class="admin-tab" style="display:none">
+        <div class="dash-section">
+          <div class="dash-section-header">
+            <h2 class="dash-section-title">Log Aktivitas</h2>
+            <button class="btn btn-ghost btn-sm" id="btnRefreshLogs">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table" id="logsTable">
+              <thead>
+                <tr><th>Waktu</th><th>Aksi</th><th>Detail</th><th>IP</th></tr>
+              </thead>
+              <tbody id="logsBody">
+                <tr><td colspan="4" style="text-align:center;color:var(--c-text-3);padding:var(--sp-8)">Memuat log...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /#adminDashboard -->
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModalOverlay" role="dialog" aria-modal="true" aria-label="Detail janji temu">
+  <div class="modal" id="detailModal" style="max-width:640px">
+    <div class="modal-header">
+      <h3 class="modal-title" id="detailModalTitle">Detail Janji Temu</h3>
+      <button class="modal-close" id="detailModalClose" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="detailGrid"></div>
+    </div>
+    <div class="modal-footer" id="detailFooter"></div>
+  </div>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal-overlay" id="statusModalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" id="statusModal" style="max-width:420px">
+    <div class="modal-header">
+      <h3 class="modal-title">Ubah Status</h3>
+      <button class="modal-close" id="statusModalClose" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.9375rem;color:var(--c-text-2);margin-bottom:var(--sp-5)">Pilih status baru untuk janji ini:</p>
+      <div style="display:flex;flex-direction:column;gap:var(--sp-3)" id="statusOptions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script src="/script.js" defer></script>
+<script>window.__ADMIN_PAGE__ = true;</script>
 </body>
 </html>
