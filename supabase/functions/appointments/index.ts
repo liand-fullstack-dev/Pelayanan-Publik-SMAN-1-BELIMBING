@@ -1,314 +1,212 @@
+/**
+ * Supabase Edge Function: appointments
+ * CRUD + WhatsApp auto-send on create
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 import { corsHeaders } from "../_shared/cors.ts";
 
-// Security constants
-const MAX_REQUESTS_PER_MINUTE = 30;
-const MAX_REQUESTS_PER_HOUR = 200;
-const BLOCK_DURATION_MINUTES = 15;
+const MAX_RPS = 30, MAX_RPH = 200;
 
-// Input sanitization
-function sanitizeInput(str) {
-  if (typeof str !== "string") return "";
-  return str
-    .replace(/[<>]/g, "")
-    .replace(/javascript:/gi, "")
-    .replace(/on\w+=/gi, "")
-    .trim()
-    .substring(0, 500);
+function sanitize(s: unknown): string {
+  if (typeof s !== "string") return "";
+  return s.replace(/[<>]/g, "").replace(/javascript:/gi, "").replace(/on\w+=/gi, "").trim().substring(0, 1000);
+}
+function validatePhone(p: string): string | null {
+  const c = (p || "").replace(/\D/g, "");
+  return /^\d{10,15}$/.test(c) ? c : null;
+}
+function validateDate(d: string): string | null {
+  const date = new Date(d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const max = new Date(); max.setDate(max.getDate() + 60);
+  return date >= today && date <= max ? d : null;
+}
+function validateTime(t: string): string | null {
+  return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(t) ? t : null;
 }
 
-function validatePhone(phone) {
-  const clean = phone.replace(/\D/g, "");
-  return /^\d{10,15}$/.test(clean) ? clean : null;
-}
-
-function validateDate(dateStr) {
-  const date = new Date(dateStr);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 30);
-  return date >= today && date <= maxDate ? dateStr : null;
-}
-
-function validateTime(timeStr) {
-  return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(timeStr) ? timeStr : null;
-}
-
-// Rate limiting
-async function checkRateLimit(supabase, ip, endpoint) {
+async function rateLimit(supabase: any, ip: string, endpoint: string) {
   const now = new Date();
-  const oneMinuteAgo = new Date(now - 60 * 1000);
-  const oneHourAgo = new Date(now - 60 * 60 * 1000);
-
-  const { data: minuteData } = await supabase
-    .from("rate_limit_logs")
-    .select("count")
-    .eq("ip_address", ip)
-    .eq("endpoint", endpoint)
-    .gte("timestamp", oneMinuteAgo.toISOString());
-
-  const minuteCount = minuteData?.reduce((sum, r) => sum + r.count, 0) || 0;
-  if (minuteCount >= MAX_REQUESTS_PER_MINUTE) {
+  const m1 = new Date(+now - 60_000).toISOString();
+  const h1 = new Date(+now - 3_600_000).toISOString();
+  const { data: md } = await supabase.from("rate_limit_logs")
+    .select("count").eq("ip_address", ip).eq("endpoint", endpoint).gte("timestamp", m1);
+  if ((md || []).reduce((s: number, r: any) => s + r.count, 0) >= MAX_RPS)
     return { allowed: false, retryAfter: 60 };
-  }
-
-  const { data: hourData } = await supabase
-    .from("rate_limit_logs")
-    .select("count")
-    .eq("ip_address", ip)
-    .eq("endpoint", endpoint)
-    .gte("timestamp", oneHourAgo.toISOString());
-
-  const hourCount = hourData?.reduce((sum, r) => sum + r.count, 0) || 0;
-  if (hourCount >= MAX_REQUESTS_PER_HOUR) {
+  const { data: hd } = await supabase.from("rate_limit_logs")
+    .select("count").eq("ip_address", ip).eq("endpoint", endpoint).gte("timestamp", h1);
+  if ((hd || []).reduce((s: number, r: any) => s + r.count, 0) >= MAX_RPH)
     return { allowed: false, retryAfter: 3600 };
-  }
-
-  await supabase.from("rate_limit_logs").insert({
-    ip_address: ip,
-    endpoint: endpoint,
-    method: "POST",
-    count: 1,
-  });
-
+  await supabase.from("rate_limit_logs").insert({ ip_address: ip, endpoint, method: "POST", count: 1 });
   return { allowed: true };
 }
 
-// Verify admin token
-async function verifyAdminToken(supabase, token) {
+async function verifyAdmin(supabase: any, token: string | null): Promise<boolean> {
   if (!token) return false;
-  const { data } = await supabase
-    .from("admin_sessions")
-    .select("*")
-    .eq("session_token", token)
-    .gt("expires_at", new Date().toISOString())
-    .single();
+  const { data } = await supabase.from("admin_sessions").select("id")
+    .eq("session_token", token).gt("expires_at", new Date().toISOString()).single();
   return !!data;
 }
 
-// Generate queue number
-async function generateQueueNumber(supabase, tanggal) {
-  const { data } = await supabase
-    .from("appointments")
-    .select("id")
-    .eq("tanggal", tanggal);
-
-  const count = data?.length || 0;
-  const prefix = String.fromCharCode(65 + Math.floor(count / 999) % 26);
-  const number = String((count % 999) + 1).padStart(3, "0");
-  return `${prefix}-${number}`;
+async function generateQueueNumber(supabase: any, tanggal: string): Promise<string> {
+  const { count } = await supabase.from("appointments")
+    .select("id", { count: "exact" }).eq("tanggal", tanggal);
+  const n = count || 0;
+  const prefix = String.fromCharCode(65 + Math.floor(n / 999) % 26);
+  return `${prefix}-${String((n % 999) + 1).padStart(3, "0")}`;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
+  if (req.method === "OPTIONS")
     return new Response(null, { status: 204, headers: corsHeaders });
-  }
 
   const url = new URL(req.url);
   const path = url.pathname;
   const method = req.method;
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const json = (body: object, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
 
   try {
-    // Rate limit check for mutations
-    if (method === "POST" || method === "PUT" || method === "DELETE") {
-      const rateCheck = await checkRateLimit(supabase, ip, path);
-      if (!rateCheck.allowed) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            message: "Rate limit exceeded. Please try again later.",
-            retryAfter: rateCheck.retryAfter,
-          }),
-          {
-            status: 429,
-            headers: {
-              ...corsHeaders,
-              "Retry-After": String(rateCheck.retryAfter),
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
+    // Rate limit mutations
+    if (["POST", "PUT", "DELETE"].includes(method)) {
+      const { allowed, retryAfter } = await rateLimit(supabase, ip, path);
+      if (!allowed) return json({ success: false, message: "Rate limit. Coba lagi nanti.", retryAfter }, 429);
     }
 
-    // GET /appointments - List all (public)
+    // ── GET /appointments ──────────────────────────────────────
     if (method === "GET" && path.endsWith("/appointments")) {
       const { data, error } = await supabase
-        .from("appointments")
-        .select("*")
+        .from("appointments").select("*")
         .order("created_at", { ascending: false });
-
       if (error) throw error;
-
-      return new Response(
-        JSON.stringify({ success: true, data }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json({ success: true, data });
     }
 
-    // POST /appointments - Create new (public)
+    // ── GET /appointments/:id ──────────────────────────────────
+    if (method === "GET" && path.match(/\/appointments\/[^/]+$/)) {
+      const id = path.split("/").pop();
+      const { data, error } = await supabase
+        .from("appointments").select("*").eq("id", id).single();
+      if (error || !data) return json({ success: false, message: "Tidak ditemukan" }, 404);
+      return json({ success: true, data });
+    }
+
+    // ── POST /appointments ─────────────────────────────────────
     if (method === "POST" && path.endsWith("/appointments")) {
       const body = await req.json();
 
-      const namaLengkap = sanitizeInput(body.namaLengkap);
-      const nomorWA = validatePhone(body.nomorWA);
-      const tujuanBertemu = sanitizeInput(body.tujuanBertemu);
-      const keperluan = sanitizeInput(body.keperluan);
-      const tanggal = validateDate(body.tanggal);
-      const jam = validateTime(body.jam);
-      const instansi = body.instansi ? sanitizeInput(body.instansi) : null;
+      const namaLengkap    = sanitize(body.namaLengkap);
+      const nomorWA        = validatePhone(body.nomorWA);
+      const tujuanBertemu  = sanitize(body.tujuanBertemu);
+      const keperluan      = sanitize(body.keperluan);
+      const tanggal        = validateDate(body.tanggal);
+      const jam            = validateTime(body.jam);
+      const instansi       = body.instansi ? sanitize(body.instansi) : null;
+      const dokumenUrl     = body.dokumenUrl ? sanitize(body.dokumenUrl) : null;
 
-      const errors = [];
+      const errors: string[] = [];
       if (!namaLengkap || namaLengkap.length < 3) errors.push("Nama lengkap minimal 3 karakter");
-      if (!nomorWA) errors.push("Nomor WhatsApp tidak valid");
+      if (!nomorWA) errors.push("Nomor WhatsApp tidak valid (10–15 digit)");
       if (!tujuanBertemu) errors.push("Tujuan bertemu wajib dipilih");
       if (!keperluan || keperluan.length < 10) errors.push("Keperluan minimal 10 karakter");
-      if (!tanggal) errors.push("Tanggal tidak valid (maksimal 30 hari ke depan)");
+      if (!tanggal) errors.push("Tanggal tidak valid (maks 60 hari ke depan)");
       if (!jam) errors.push("Jam tidak valid");
+      if (errors.length) return json({ success: false, errors }, 400);
 
-      if (errors.length > 0) {
-        return new Response(
-          JSON.stringify({ success: false, errors }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      const nomorAntrian = await generateQueueNumber(supabase, tanggal!);
 
-      const nomorAntrian = await generateQueueNumber(supabase, tanggal);
-
-      const { data, error } = await supabase
-        .from("appointments")
-        .insert({
-          nomor_antrian: nomorAntrian,
-          nama_lengkap: namaLengkap,
-          nomor_wa: nomorWA,
-          instansi: instansi,
-          tujuan_bertemu: tujuanBertemu,
-          keperluan: keperluan,
-          tanggal: tanggal,
-          jam: jam,
-          status: "Menunggu Konfirmasi",
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.from("appointments").insert({
+        nomor_antrian: nomorAntrian,
+        nama_lengkap: namaLengkap,
+        nomor_wa: nomorWA,
+        instansi,
+        tujuan_bertemu: tujuanBertemu,
+        keperluan,
+        tanggal,
+        jam,
+        status: "Menunggu Konfirmasi",
+        dokumen_url: dokumenUrl,
+      }).select().single();
 
       if (error) throw error;
 
-      return new Response(
-        JSON.stringify({ success: true, data }),
-        { status: 201, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      // Trigger WhatsApp send (non-blocking)
+      const waFnUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/whatsapp-send`;
+      fetch(waFnUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+        },
+        body: JSON.stringify({ appointmentId: data.id }),
+      }).catch((e) => console.warn("WA trigger failed:", e));
+
+      return json({ success: true, data }, 201);
     }
 
-    // PUT /appointments/:id - Update (admin only)
+    // ── PUT /appointments/:id ──────────────────────────────────
     if (method === "PUT" && path.match(/\/appointments\/[^/]+$/)) {
-      const adminToken = req.headers.get("x-admin-token");
-      const isAdmin = await verifyAdminToken(supabase, adminToken);
-
-      if (!isAdmin) {
-        return new Response(
-          JSON.stringify({ success: false, message: "Unauthorized" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      const token = req.headers.get("x-admin-token");
+      if (!(await verifyAdmin(supabase, token)))
+        return json({ success: false, message: "Unauthorized" }, 401);
 
       const id = path.split("/").pop();
       const body = await req.json();
+      const allowed = ["status", "nama_lengkap", "tujuan_bertemu", "tanggal", "jam", "dokumen_url"];
+      const validStatuses = ["Menunggu Konfirmasi", "Dikonfirmasi", "Selesai", "Dibatalkan"];
+      const updates: Record<string, unknown> = {};
 
-      const allowedUpdates = ["status", "nama_lengkap", "tujuan_bertemu", "tanggal", "jam"];
-      const updates = {};
-
-      for (const key of allowedUpdates) {
-        if (body[key] !== undefined) {
-          if (key === "status") {
-            const validStatuses = ["Menunggu Konfirmasi", "Dikonfirmasi", "Selesai", "Dibatalkan"];
-            if (!validStatuses.includes(body[key])) {
-              return new Response(
-                JSON.stringify({ success: false, message: "Status tidak valid" }),
-                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-              );
-            }
-            updates[key] = body[key];
-          } else {
-            updates[key] = sanitizeInput(body[key]);
-          }
+      for (const k of allowed) {
+        if (body[k] === undefined) continue;
+        if (k === "status") {
+          if (!validStatuses.includes(body[k])) return json({ success: false, message: "Status tidak valid" }, 400);
+          updates[k] = body[k];
+        } else {
+          updates[k] = sanitize(body[k]);
         }
       }
-
       updates.updated_at = new Date().toISOString();
 
-      const { data, error } = await supabase
-        .from("appointments")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
+      const { data, error } = await supabase.from("appointments")
+        .update(updates).eq("id", id).select().single();
       if (error) throw error;
 
       await supabase.from("activity_logs").insert({
-        action: "UPDATE_APPOINTMENT",
-        details: { id, changes: updates },
-        ip_address: ip,
+        action: "UPDATE_APPOINTMENT", details: { id, changes: updates }, ip_address: ip,
       });
 
-      return new Response(
-        JSON.stringify({ success: true, data }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json({ success: true, data });
     }
 
-    // DELETE /appointments/:id - Delete (admin only)
+    // ── DELETE /appointments/:id ───────────────────────────────
     if (method === "DELETE" && path.match(/\/appointments\/[^/]+$/)) {
-      const adminToken = req.headers.get("x-admin-token");
-      const isAdmin = await verifyAdminToken(supabase, adminToken);
-
-      if (!isAdmin) {
-        return new Response(
-          JSON.stringify({ success: false, message: "Unauthorized" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      const token = req.headers.get("x-admin-token");
+      if (!(await verifyAdmin(supabase, token)))
+        return json({ success: false, message: "Unauthorized" }, 401);
 
       const id = path.split("/").pop();
-
-      const { error } = await supabase
-        .from("appointments")
-        .delete()
-        .eq("id", id);
-
+      const { error } = await supabase.from("appointments").delete().eq("id", id);
       if (error) throw error;
 
       await supabase.from("activity_logs").insert({
-        action: "DELETE_APPOINTMENT",
-        details: { id },
-        ip_address: ip,
+        action: "DELETE_APPOINTMENT", details: { id }, ip_address: ip,
       });
-
-      return new Response(
-        JSON.stringify({ success: true, message: "Appointment deleted" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json({ success: true });
     }
 
-    return new Response(
-      JSON.stringify({ success: false, message: "Not found" }),
-      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
-  } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ success: false, message: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return json({ success: false, message: "Not found" }, 404);
+  } catch (err: any) {
+    console.error("appointments error:", err);
+    return json({ success: false, message: "Internal server error", detail: err.message }, 500);
   }
 });
-
