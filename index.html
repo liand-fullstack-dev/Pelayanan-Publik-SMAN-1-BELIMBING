@@ -1,528 +1,633 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pelayanan Publik - SMAN 1 BELIMBING</title>
-    <meta name="description" content="Ajukan janji temu dan kunjungan ke SMAN 1 Belimbing secara digital — cepat, terstruktur, satu portal.">
-    <link rel="icon" href="/logo.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Portal Pelayanan Digital SMAN 1 BELIMBING</title>
+  <meta name="description" content="Ajukan janji temu ke SMAN 1 Belimbing secara digital — cepat, tanpa antre, terstruktur. Sistem kirim otomatis ke WhatsApp tujuan.">
+  <meta name="keywords" content="SMAN 1 Belimbing, janji temu, pelayanan publik, portal digital, Muara Enim">
+  <meta name="author" content="SMAN 1 BELIMBING">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Portal Pelayanan Digital SMAN 1 BELIMBING">
+  <meta property="og:description" content="Janji temu sekolah tanpa antre dua kali. Ajukan kunjungan secara digital.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/logo.png">
+  <meta name="theme-color" content="#04091F">
+  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 </head>
 <body>
 
-<!-- ===================== INTRO ===================== -->
-<section id="intro" aria-label="Animasi pembuka SMAN 1 Belimbing">
-    <canvas id="star-canvas" aria-hidden="true"></canvas>
-    <div class="intro-grain" aria-hidden="true"></div>
-    <button id="skip-intro" type="button">Lewati <span>→</span></button>
-    <div class="intro-progress" aria-hidden="true"><span id="progress-fill"></span></div>
+<!-- ═══════════════ INTRO SCREEN ═══════════════ -->
+<div id="intro" role="dialog" aria-label="Selamat datang di Portal Pelayanan Digital SMAN 1 BELIMBING" aria-modal="true">
+  <canvas id="intro-bg-canvas" aria-hidden="true"></canvas>
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+  <div class="intro-vignette" aria-hidden="true"></div>
+  <div class="intro-noise" aria-hidden="true"></div>
 
-    <div class="intro-stage">
-        <div class="eyebrow-row">
-            <span class="eyebrow mono">PORTAL LAYANAN</span>
-            <span class="eyebrow-divider" aria-hidden="true"></span>
-            <span class="eyebrow mono">SMAN 1 BELIMBING</span>
-        </div>
-
-        <div class="emblem-wrap">
-            <svg id="emblem-svg" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path id="shield-path" d="M100 8 L186 40 V120 C186 168 148 198 100 212 C52 198 14 168 14 120 V40 Z" stroke="#f2c230" stroke-width="2.5"/>
-                <path id="star-path" d="M100 56 L114 92 L152 92 L121 114 L132 150 L100 128 L68 150 L79 114 L48 92 L86 92 Z" stroke="#f7d564" stroke-width="2"/>
-            </svg>
-            <img id="school-logo-intro" src="/logo.png" alt="Logo SMAN 1 Belimbing" decoding="async" onerror="this.dataset.missing='1'">
-        </div>
-
-        <h1 class="title-line" aria-label="SMAN 1 BELIMBING">
-            <span class="word" data-word="SMAN">SMAN</span>
-            <span class="word" data-word="1">1</span>
-            <span class="word word-belimbing" data-word="BELIMBING">BELIMBING</span>
-        </h1>
-
-        <p class="tagline">Pelayanan publik sekolah, satu pintu.</p>
+  <div class="intro-content">
+    <div class="logo-wrap" id="logo-wrap">
+      <div class="logo-glow" aria-hidden="true"></div>
+      <div class="logo-ring" aria-hidden="true"></div>
+      <img src="/logo.png" alt="Logo SMAN 1 BELIMBING" class="logo-img" id="intro-logo">
     </div>
-</section>
-    <main id="site">
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">
-                <div class="logo-icon">
-                    <img src="/logo.png" alt="Logo SMAN 1 Belimbing" class="logo-img">
-                </div>
-                <div class="logo-text">
-                    <span class="logo-title">SMAN 1 BELIMBING</span>
-                    <span class="logo-subtitle">Pelayanan Publik</span>
-                </div>
+
+    <p class="intro-eyebrow" id="intro-eyebrow">Portal Pelayanan Digital</p>
+    <h1 class="intro-school-name" id="intro-school-name" aria-label="SMAN 1 BELIMBING">SMAN 1 BELIMBING</h1>
+    <div class="intro-location" id="intro-location">
+      <span class="intro-location-dot" aria-hidden="true"></span>
+      <span>Muara Enim, Sumatera Selatan</span>
+      <span class="intro-location-dot" aria-hidden="true"></span>
+    </div>
+    <div class="intro-divider" id="intro-divider" aria-hidden="true"></div>
+    <p class="intro-system-label" id="intro-system-label">Sistem Manajemen Layanan Kunjungan</p>
+
+    <div class="intro-services" role="list">
+      <div class="intro-service-card" role="listitem" id="svc-1">
+        <div class="intro-service-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+          <div class="intro-service-name">Janji Temu</div>
+          <div class="intro-service-desc">Buat kunjungan digital</div>
+        </div>
+      </div>
+      <div class="intro-service-card" role="listitem" id="svc-2">
+        <div class="intro-service-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <div>
+          <div class="intro-service-name">Antrian Digital</div>
+          <div class="intro-service-desc">Nomor antrian otomatis</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="intro-enter-btn" id="intro-enter-btn" aria-label="Masuk ke portal">
+      Masuk ke Portal
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <button class="intro-skip-btn" id="intro-skip-btn" aria-label="Lewati animasi pembuka">
+    <span class="intro-skip-ring-wrap" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <circle class="intro-skip-ring-bg" cx="12" cy="12" r="10"/>
+        <circle class="intro-skip-ring-progress" id="intro-skip-ring" cx="12" cy="12" r="10"/>
+      </svg>
+    </span>
+    Lewati
+  </button>
+  <div class="intro-progress-bar" aria-hidden="true">
+    <div class="intro-progress-fill" id="intro-progress-fill"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN SITE ═══════════════ -->
+<div id="site" style="display:none">
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Navigasi utama">
+    <div class="nav-container">
+      <!-- Logo — klik 3x = akses admin -->
+      <a href="/" class="nav-logo" id="navLogo" title="Portal Pelayanan Digital SMAN 1 BELIMBING">
+        <div class="logo-icon" id="navLogoIcon" title="Klik logo untuk akses admin">
+          <img src="/logo.png" alt="Logo SMAN 1 BELIMBING" class="logo-img" loading="lazy">
+          <div class="logo-admin-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+          </div>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">SMAN 1 BELIMBING</span>
+          <span class="logo-subtitle">Portal Pelayanan Digital</span>
+        </div>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <!-- Desktop nav links -->
+      <div class="nav-links" id="navLinks">
+        <a href="#hero"      class="nav-link" data-scroll>Beranda</a>
+        <a href="#alur"      class="nav-link" data-scroll>Alur</a>
+        <a href="#form-janji" class="nav-link" data-scroll>Buat Janji</a>
+        <a href="#faq"       class="nav-link" data-scroll>FAQ</a>
+        <a href="/daftar-janji" class="nav-link">Daftar Janji</a>
+      </div>
+
+      <!-- Theme toggle — always visible in navbar -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Ganti tema gelap/terang" title="Ganti tema">
+        <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+
+      <!-- Mobile hamburger -->
+      <button class="nav-toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile nav menu -->
+  <div class="nav-mobile-menu" id="navMobileMenu" role="menu">
+    <a href="#hero"       class="nav-mobile-link" role="menuitem" data-scroll>Beranda</a>
+    <a href="#alur"       class="nav-mobile-link" role="menuitem" data-scroll>Alur</a>
+    <a href="#form-janji" class="nav-mobile-link" role="menuitem" data-scroll>Buat Janji</a>
+    <a href="#faq"        class="nav-mobile-link" role="menuitem" data-scroll>FAQ</a>
+    <a href="/daftar-janji" class="nav-mobile-link" role="menuitem">Daftar Janji</a>
+  </div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="hero" aria-labelledby="heroTitle">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-grain" aria-hidden="true"></div>
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Sistem Resmi SMAN 1 BELIMBING</span>
+          </div>
+          <h1 class="hero-title" id="heroTitle">
+            Janji temu sekolah,<br><em>tanpa antre dua kali.</em>
+          </h1>
+          <p class="hero-desc">
+            Ajukan kunjungan ke SMAN 1 Belimbing secara digital. Pilih tujuan dan jadwal — notifikasi terkirim otomatis ke WhatsApp pihak yang dituju, tanpa Anda kirim manual.
+          </p>
+          <div class="hero-cta">
+            <a href="#form-janji" class="btn btn-gold btn-lg" data-scroll>
+              <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Buat Janji Temu
             </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <a href="/daftar-janji" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,.3);">
+              <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Lihat Antrian
+            </a>
+          </div>
+          <div class="hero-stats" aria-label="Statistik antrian">
+            <div class="hero-stat">
+              <span class="hero-stat-num" id="statTotal">0</span>
+              <span class="hero-stat-label">Total Janji</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-num" id="statToday">0</span>
+              <span class="hero-stat-label">Hari Ini</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-num" id="statWaiting">0</span>
+              <span class="hero-stat-label">Menunggu</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-queue-card">
+            <div class="hqc-header">
+              <span class="hqc-title">Antrian Hari Ini</span>
+              <span class="hqc-live">Live</span>
+            </div>
+            <div id="heroQueuePreview">
+              <div class="hqc-empty">Memuat antrian...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALUR -->
+    <section class="section alur" id="alur" aria-labelledby="alurTitle">
+      <div class="section-container">
+        <div class="section-header">
+          <p class="section-tag">Alur Penggunaan</p>
+          <h2 class="section-title" id="alurTitle">Cara Menggunakan Portal</h2>
+          <p class="section-desc">Empat langkah sederhana — dari formulir hingga konfirmasi WhatsApp tujuan</p>
+        </div>
+        <div class="alur-grid">
+          <div class="alur-card">
+            <div class="alur-step">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span class="alur-num">1</span>
+            </div>
+            <h3>Isi Formulir</h3>
+            <p>Lengkapi data diri, pilih tujuan bertemu, keperluan, dan jadwal yang diinginkan. Upload dokumen jika diperlukan.</p>
+          </div>
+          <div class="alur-card">
+            <div class="alur-step">
+              <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="alur-num">2</span>
+            </div>
+            <h3>Validasi Otomatis</h3>
+            <p>Sistem memvalidasi data, memeriksa jadwal, dan menerbitkan nomor antrian unik secara otomatis.</p>
+          </div>
+          <div class="alur-card">
+            <div class="alur-step">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.5 19.79 19.79 0 01.01 6 2 2 0 012 4h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 11a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              <span class="alur-num">3</span>
+            </div>
+            <h3>Notifikasi WhatsApp</h3>
+            <p>Detail janji temu langsung dikirim ke WhatsApp pihak yang dituju — bukan ke nomor umum, tapi ke orang yang tepat.</p>
+          </div>
+          <div class="alur-card">
+            <div class="alur-step">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span class="alur-num">4</span>
+            </div>
+            <h3>Tiket Digital</h3>
+            <p>Terima tiket digital dengan QR code untuk verifikasi saat datang ke sekolah. Bisa dicetak atau disimpan di HP.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="section form-section" id="form-janji" aria-labelledby="formTitle">
+      <div class="section-container">
+        <div class="section-header">
+          <p class="section-tag">Formulir</p>
+          <h2 class="section-title" id="formTitle">Buat Janji Temu</h2>
+          <p class="section-desc">Lengkapi semua data berikut. Notifikasi akan dikirim otomatis ke pihak yang dituju.</p>
+        </div>
+
+        <form class="appointment-form" id="appointmentForm" novalidate aria-label="Formulir janji temu">
+
+          <!-- Data Pengunjung -->
+          <div class="form-group">
+            <h3 class="form-group-title">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Data Pengunjung
+            </h3>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="namaLengkap">Nama Lengkap <span class="required" aria-label="wajib">*</span></label>
+                <input type="text" id="namaLengkap" name="namaLengkap" placeholder="Nama lengkap sesuai identitas" autocomplete="name" aria-required="true">
+                <span class="field-error" id="err-namaLengkap" role="alert"></span>
+              </div>
+              <div class="form-field">
+                <label for="nomorWA">Nomor WhatsApp <span class="required" aria-label="wajib">*</span></label>
+                <input type="tel" id="nomorWA" name="nomorWA" placeholder="Contoh: 08123456789" autocomplete="tel" aria-required="true">
+                <span class="field-error" id="err-nomorWA" role="alert"></span>
+              </div>
+            </div>
+            <div class="form-field" style="margin-top:var(--sp-5)">
+              <label for="instansi">Instansi / Asal (Opsional)</label>
+              <input type="text" id="instansi" name="instansi" placeholder="Nama instansi, organisasi, atau sekolah asal">
+            </div>
+          </div>
+
+          <!-- Tujuan -->
+          <div class="form-group">
+            <h3 class="form-group-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+              Ingin Bertemu Dengan
+            </h3>
+            <div class="form-field">
+              <label for="tujuanBertemuHidden">Pilih Tujuan <span class="required" aria-label="wajib">*</span></label>
+              <div class="custom-select" id="tujuanSelect" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                <div class="select-trigger" id="tujuanTrigger" tabindex="0" role="button" aria-label="Pilih tujuan bertemu">
+                  <span class="select-placeholder" id="tujuanDisplay">Pilih tujuan bertemu</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="select-options" id="tujuanOptions" role="listbox">
+                  <div class="select-option" data-value="Kepala Sekolah" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Kepala Sekolah</span>
+                  </div>
+                  <div class="select-option" data-value="Wakil Kepala Sekolah" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    <span>Wakil Kepala Sekolah</span>
+                  </div>
+                  <div class="select-option" data-value="Kepala Kurikulum" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+                    <span>Kepala Kurikulum</span>
+                  </div>
+                  <div class="select-option" data-value="Guru BK" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    <span>Guru BK</span>
+                  </div>
+                  <div class="select-option" data-value="Wali Kelas" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    <span>Wali Kelas</span>
+                  </div>
+                  <div class="select-option" data-value="Guru Mata Pelajaran" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    <span>Guru Mata Pelajaran</span>
+                  </div>
+                  <div class="select-option" data-value="Tata Usaha" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                    <span>Tata Usaha</span>
+                  </div>
+                  <div class="select-option" data-value="Bendahara" role="option">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                    <span>Bendahara</span>
+                  </div>
+                  <div class="select-option" data-value="Operator Sekolah" role="option">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <span>Operator Sekolah</span>
+                  </div>
+                  <div class="select-option" data-value="Komite Sekolah" role="option">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    <span>Komite Sekolah</span>
+                  </div>
+                  <div class="select-option" data-value="Lainnya" role="option">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                    <span>Lainnya</span>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="tujuanBertemuHidden" name="tujuanBertemu" aria-hidden="true">
+              <span class="field-error" id="err-tujuanBertemu" role="alert"></span>
+            </div>
+            <div class="form-field hidden" id="tujuanLainnyaField" style="margin-top:var(--sp-4)">
+              <label for="tujuanLainnya">Sebutkan Tujuan <span class="required" aria-label="wajib">*</span></label>
+              <input type="text" id="tujuanLainnya" name="tujuanLainnya" placeholder="Tuliskan tujuan bertemu Anda">
+              <span class="field-error" id="err-tujuanLainnya" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Keperluan -->
+          <div class="form-group">
+            <h3 class="form-group-title">
+              <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              Tujuan Pertemuan
+            </h3>
+            <div class="form-field">
+              <label for="keperluan">Keperluan / Agenda <span class="required" aria-label="wajib">*</span></label>
+              <textarea id="keperluan" name="keperluan" rows="4" placeholder="Jelaskan keperluan pertemuan secara singkat dan jelas. Contoh: Konsultasi perkembangan akademik anak, pengambilan dokumen, administrasi PPDB, dll." aria-required="true"></textarea>
+              <span class="char-count"><span id="charCount">0</span> / 500</span>
+              <span class="field-error" id="err-keperluan" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Upload Dokumen -->
+          <div class="form-group">
+            <h3 class="form-group-title">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              Upload Dokumen <span style="font-weight:400;color:var(--c-text-3);font-size:.8125rem;">(Opsional)</span>
+            </h3>
+            <div class="form-field">
+              <div class="file-upload-area" id="fileUploadArea" role="button" tabindex="0" aria-label="Area upload dokumen">
+                <input type="file" id="dokumenFile" name="dokumen" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden aria-label="Pilih file">
+                <div class="file-upload-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                </div>
+                <p class="file-upload-text">Seret file ke sini atau <span class="file-upload-link">klik untuk memilih</span></p>
+                <p class="file-upload-hint">PDF, DOC, DOCX, JPG, PNG · Maks. 5MB</p>
+                <p class="file-upload-note">Upload file undangan seperti undangan perlombaan jika itu tujuan Anda</p>
+              </div>
+              <div class="file-preview hidden" id="filePreview">
+                <div class="file-preview-info">
+                  <div class="file-preview-icon" id="filePreviewIcon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div>
+                    <span class="file-name" id="fileName">-</span>
+                    <span class="file-size" id="fileSize">-</span>
+                  </div>
+                </div>
+                <button type="button" class="file-remove" id="fileRemove" aria-label="Hapus file">
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <span class="field-error" id="err-dokumen" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Jadwal -->
+          <div class="form-group">
+            <h3 class="form-group-title">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jadwal Pertemuan
+            </h3>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="tanggal">Tanggal <span class="required" aria-label="wajib">*</span></label>
+                <input type="date" id="tanggal" name="tanggal" aria-required="true">
+                <span class="field-error" id="err-tanggal" role="alert"></span>
+              </div>
+              <div class="form-field">
+                <label for="jam">Jam <span class="required" aria-label="wajib">*</span></label>
+                <input type="time" id="jam" name="jam" min="07:00" max="16:00" aria-required="true">
+                <span class="field-error" id="err-jam" role="alert"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg btn-submit" id="btnSubmit">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              <span id="submitText">Ajukan Janji Temu</span>
+              <span id="submitLoader" class="hidden" style="display:none;align-items:center;gap:8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                Memproses...
+              </span>
             </button>
-            <div class="nav-menu" id="navMenu">
-                <a href="#hero" class="nav-link">Beranda</a>
-                <a href="#alur" class="nav-link">Alur</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-                <a href="/daftar-janji" class="nav-link">Daftar Janji</a>
-                <a href="/admin" class="nav-link nav-link-admin">Admin</a>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <section class="hero" id="hero">
-        <div class="hero-bg" aria-hidden="true"></div>
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Sistem Resmi Sekolah</span>
-                </div>
-                <h1 class="hero-title">
-                    Janji temu sekolah,
-                    <span class="hero-highlight">tanpa antre dua kali.</span>
-                </h1>
-                <p class="hero-desc">
-                    Ajukan kunjungan ke SMAN 1 Belimbing secara digital. Pilih tujuan dan jadwal, sistem memberi nomor antrian, dan konfirmasi terkirim otomatis ke sekolah.
-                </p>
-                <div class="hero-actions">
-                    <a href="#form-janji" class="btn btn-primary btn-lg">
-                        <i class="fas fa-calendar-plus"></i>
-                        <span>Buat Janji Temu</span>
-                    </a>
-                    <a href="/daftar-janji" class="btn btn-outline btn-lg">
-                        <i class="fas fa-list-alt"></i>
-                        <span>Lihat Daftar Janji</span>
-                    </a>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="statTotal">0</span>
-                        <span class="stat-label">Total Janji</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="statToday">0</span>
-                        <span class="stat-label">Hari Ini</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="statWaiting">0</span>
-                        <span class="stat-label">Menunggu</span>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="hero-card">
-                    <div class="hero-card-header">
-                        <div class="hero-card-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <span class="hero-card-title">Antrian Hari Ini</span>
-                    </div>
-                    <div class="hero-card-body" id="heroQueuePreview">
-                        <div class="queue-skeleton">
-                            <div class="skeleton-line"></div>
-                            <div class="skeleton-line short"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+          </div>
+        </form>
+      </div>
     </section>
 
-    <section class="alur" id="alur">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Alur Penggunaan</span>
-                <h2 class="section-title">Cara Menggunakan Sistem</h2>
-                <p class="section-desc">Empat langkah, dari formulir sampai kartu janji temu</p>
-            </div>
-            <div class="alur-grid">
-                <div class="alur-card">
-                    <div class="alur-number">01</div>
-                    <h3>Isi Formulir</h3>
-                    <p>Lengkapi data diri, tujuan bertemu, dan jadwal yang diinginkan.</p>
-                </div>
-                <div class="alur-card">
-                    <div class="alur-number">02</div>
-                    <h3>Validasi Sistem</h3>
-                    <p>Sistem memeriksa ketersediaan jadwal dan memberikan nomor antrian.</p>
-                </div>
-                <div class="alur-card">
-                    <div class="alur-number">03</div>
-                    <h3>Terkirim ke Sekolah</h3>
-                    <p>Detail janji temu langsung diteruskan ke WhatsApp sekolah secara otomatis — tidak perlu mengirim ulang.</p>
-                </div>
-                <div class="alur-card">
-                    <div class="alur-number">04</div>
-                    <h3>Terima Kartu Janji</h3>
-                    <p>Dapatkan kartu janji dengan kode QR untuk verifikasi saat datang.</p>
-                </div>
-            </div>
+    <!-- FAQ -->
+    <section class="section faq" id="faq" aria-labelledby="faqTitle">
+      <div class="section-container">
+        <div class="section-header">
+          <p class="section-tag">FAQ</p>
+          <h2 class="section-title" id="faqTitle">Pertanyaan Umum</h2>
+          <p class="section-desc">Temukan jawaban untuk pertanyaan yang sering ditanyakan</p>
         </div>
+        <div class="faq-list" id="faqList" role="list">
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Bagaimana cara membuat janji temu?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Isi formulir pada bagian "Buat Janji Temu" dengan data diri lengkap, pilih tujuan bertemu, jelaskan keperluan, dan tentukan jadwal. Sistem akan otomatis menerbitkan nomor antrian dan mengirim notifikasi ke WhatsApp pihak yang dituju.</div></div>
+          </div>
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Apakah saya perlu mengirim WhatsApp secara manual?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Tidak perlu. Setelah pengajuan berhasil, sistem kami secara otomatis mengirimkan detail janji temu ke WhatsApp pihak yang Anda tuju — misalnya langsung ke nomor Kepala Sekolah jika Anda memilih tujuan "Kepala Sekolah". Anda tidak perlu mengirim apa pun secara manual.</div></div>
+          </div>
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Berapa lama waktu tunggu konfirmasi?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Konfirmasi biasanya diberikan dalam 1×24 jam pada hari kerja (Senin–Jumat, pukul 07.00–16.00 WIB). Pastikan nomor WhatsApp yang Anda masukkan aktif dan dapat menerima pesan.</div></div>
+          </div>
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Untuk apa saya upload dokumen?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Upload dokumen bersifat opsional. Sangat disarankan jika kunjungan Anda memerlukan dokumen pendukung, misalnya surat undangan perlombaan, surat keterangan, atau berkas administrasi lainnya. Dokumen ini akan membantu pihak sekolah mempersiapkan pertemuan lebih baik.</div></div>
+          </div>
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Bagaimana cara mencetak tiket antrian?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Setelah pengajuan berhasil, tiket digital dengan QR code akan muncul secara otomatis. Anda bisa menekan tombol "Cetak" untuk mencetak fisik, atau simpan tangkapan layar di HP untuk ditunjukkan saat datang ke sekolah.</div></div>
+          </div>
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false">
+              <span>Apakah bisa mengubah jadwal setelah diajukan?</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" role="region"><div class="faq-answer-inner">Untuk perubahan jadwal, silakan hubungi admin sekolah melalui WhatsApp resmi atau ajukan janji temu baru dengan jadwal yang diinginkan. Admin dapat memperbarui status janji temu melalui dashboard.</div></div>
+          </div>
+        </div>
+      </div>
     </section>
+  </main>
 
-    <section class="form-section" id="form-janji">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Formulir</span>
-                <h2 class="section-title">Buat Janji Temu</h2>
-                <p class="section-desc">Lengkapi data berikut untuk mengajukan janji temu</p>
-            </div>
-            
-            <form class="appointment-form" id="appointmentForm" novalidate>
-                <div class="form-group">
-                    <h3 class="form-group-title">
-                        <i class="fas fa-user"></i>
-                        Data Pengunjung
-                    </h3>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label for="namaLengkap">Nama Lengkap <span class="required">*</span></label>
-                            <input type="text" id="namaLengkap" name="namaLengkap" placeholder="Masukkan nama lengkap" autocomplete="name">
-                            <span class="field-error" id="error-namaLengkap"></span>
-                        </div>
-                        <div class="form-field">
-                            <label for="nomorWA">Nomor WhatsApp <span class="required">*</span></label>
-                            <input type="tel" id="nomorWA" name="nomorWA" placeholder="Contoh: 08123456789" autocomplete="tel">
-                            <span class="field-error" id="error-nomorWA"></span>
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label for="instansi">Instansi (Opsional)</label>
-                        <input type="text" id="instansi" name="instansi" placeholder="Nama instansi atau organisasi">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3 class="form-group-title">
-                        <i class="fas fa-bullseye"></i>
-                        Ingin Bertemu Dengan
-                    </h3>
-                    <div class="form-field">
-                        <label for="tujuanBertemu">Pilih Tujuan <span class="required">*</span></label>
-                        <div class="custom-select" id="tujuanSelect">
-                            <div class="select-trigger" id="tujuanTrigger">
-                                <span class="select-placeholder">Pilih tujuan bertemu</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="select-options" id="tujuanOptions">
-                                <div class="select-option" data-value="Kepala Sekolah">
-                                    <i class="fas fa-user-tie"></i>
-                                    <span>Kepala Sekolah</span>
-                                </div>
-                                <div class="select-option" data-value="Wakil Kepala Sekolah">
-                                    <i class="fas fa-user-shield"></i>
-                                    <span>Wakil Kepala Sekolah</span>
-                                </div>
-                                <div class="select-option" data-value="Kepala Kurikulum">
-                                    <i class="fas fa-book"></i>
-                                    <span>Kepala Kurikulum</span>
-                                </div>
-                                <div class="select-option" data-value="Guru BK">
-                                    <i class="fas fa-heart"></i>
-                                    <span>Guru BK</span>
-                                </div>
-                                <div class="select-option" data-value="Wali Kelas">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                    <span>Wali Kelas</span>
-                                </div>
-                                <div class="select-option" data-value="Guru Mata Pelajaran">
-                                    <i class="fas fa-graduation-cap"></i>
-                                    <span>Guru Mata Pelajaran</span>
-                                </div>
-                                <div class="select-option" data-value="Tata Usaha">
-                                    <i class="fas fa-folder-open"></i>
-                                    <span>Tata Usaha</span>
-                                </div>
-                                <div class="select-option" data-value="Bendahara">
-                                    <i class="fas fa-coins"></i>
-                                    <span>Bendahara</span>
-                                </div>
-                                <div class="select-option" data-value="Operator Sekolah">
-                                    <i class="fas fa-desktop"></i>
-                                    <span>Operator Sekolah</span>
-                                </div>
-                                <div class="select-option" data-value="Komite Sekolah">
-                                    <i class="fas fa-users"></i>
-                                    <span>Komite Sekolah</span>
-                                </div>
-                                <div class="select-option" data-value="Lainnya">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                    <span>Lainnya</span>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" id="tujuanBertemu" name="tujuanBertemu">
-                        <span class="field-error" id="error-tujuanBertemu"></span>
-                    </div>
-                    <div class="form-field hidden" id="tujuanLainnyaField">
-                        <label for="tujuanLainnya">Sebutkan Tujuan Lainnya <span class="required">*</span></label>
-                        <input type="text" id="tujuanLainnya" name="tujuanLainnya" placeholder="Tuliskan tujuan bertemu">
-                        <span class="field-error" id="error-tujuanLainnya"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3 class="form-group-title">
-                        <i class="fas fa-clipboard-list"></i>
-                        Tujuan Pertemuan
-                    </h3>
-                    <div class="form-field">
-                        <label for="keperluan">Keperluan <span class="required">*</span></label>
-                        <textarea id="keperluan" name="keperluan" rows="4" placeholder="Jelaskan keperluan pertemuan (contoh: Konsultasi, Administrasi, Pengambilan Dokumen, dll)"></textarea>
-                        <span class="char-count"><span id="charCount">0</span>/500</span>
-                        <span class="field-error" id="error-keperluan"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3 class="form-group-title">
-                        <i class="fas fa-file-upload"></i>
-                        Upload Dokumen (Opsional)
-                    </h3>
-                    <div class="form-field">
-                        <div class="file-upload" id="fileUpload">
-                            <input type="file" id="dokumen" name="dokumen" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden>
-                            <div class="file-upload-area" id="fileUploadArea">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p class="file-upload-text">Seret file ke sini atau <span class="file-upload-link">klik untuk memilih</span></p>
-                                <p class="file-upload-hint">PDF, DOC, DOCX, JPG, JPEG, PNG (Maks. 5MB)</p>
-                            </div>
-                            <div class="file-preview hidden" id="filePreview">
-                                <div class="file-preview-info">
-                                    <i class="fas fa-file" id="fileIcon"></i>
-                                    <div class="file-preview-details">
-                                        <span class="file-name" id="fileName"></span>
-                                        <span class="file-size" id="fileSize"></span>
-                                    </div>
-                                </div>
-                                <button type="button" class="file-remove" id="fileRemove" aria-label="Hapus file">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <span class="field-error" id="error-dokumen"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3 class="form-group-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        Jadwal Pertemuan
-                    </h3>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label for="tanggal">Tanggal <span class="required">*</span></label>
-                            <input type="date" id="tanggal" name="tanggal">
-                            <span class="field-error" id="error-tanggal"></span>
-                        </div>
-                        <div class="form-field">
-                            <label for="jam">Jam <span class="required">*</span></label>
-                            <input type="time" id="jam" name="jam">
-                            <span class="field-error" id="error-jam"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg btn-submit" id="btnSubmit">
-                        <span class="btn-text">Ajukan Janji Temu</span>
-                        <span class="btn-loader hidden">
-                            <i class="fas fa-circle-notch fa-spin"></i>
-                            Memproses...
-                        </span>
-                    </button>
-                </div>
-            </form>
+  <!-- FOOTER -->
+  <footer class="footer" id="kontak" role="contentinfo">
+    <div class="footer-container">
+      <div>
+        <div class="footer-brand-logo">
+          <div class="footer-logo-icon"><img src="/logo.png" alt="" loading="lazy"></div>
+          <div>
+            <div class="footer-brand-name">SMAN 1 BELIMBING</div>
+            <div class="footer-brand-sub">Portal Pelayanan Digital</div>
+          </div>
         </div>
-    </section>
-
-    <section class="faq" id="faq">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">FAQ</span>
-                <h2 class="section-title">Pertanyaan Umum</h2>
-                <p class="section-desc">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
-            </div>
-            <div class="faq-list" id="faqList">
-                <div class="faq-item">
-                    <button class="faq-question" aria-expanded="false">
-                        <span>Bagaimana cara membuat janji temu?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Isi formulir janji temu dengan data lengkap, pilih tujuan bertemu dan jadwal. Sistem akan memvalidasi dan memberikan nomor antrian otomatis.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" aria-expanded="false">
-                        <span>Apakah janji temu akan langsung dikonfirmasi?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Setelah pengajuan berhasil, detail janji temu Anda otomatis diteruskan ke WhatsApp sekolah di latar belakang — Anda tidak perlu mengirim apa pun secara manual. Status awal adalah "Menunggu Konfirmasi" dan akan diperbarui oleh admin sekolah.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" aria-expanded="false">
-                        <span>Berapa lama waktu tunggu konfirmasi?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Konfirmasi biasanya diberikan dalam waktu 1 x 24 jam pada hari kerja. Pastikan nomor WhatsApp yang dimasukkan aktif.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" aria-expanded="false">
-                        <span>Apakah bisa mengubah jadwal setelah diajukan?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Untuk perubahan jadwal, silakan hubungi admin sekolah melalui kontak yang tersedia atau ajukan janji temu baru dengan jadwal yang diinginkan.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question" aria-expanded="false">
-                        <span>Format file apa yang didukung untuk upload?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Sistem mendukung file PDF, DOC, DOCX, JPG, JPEG, dan PNG dengan ukuran maksimal 5MB.</p>
-                    </div>
-                </div>
-            </div>
+        <p class="footer-desc">Sistem pelayanan publik digital untuk memudahkan masyarakat berkomunikasi dengan pihak sekolah secara terstruktur dan efisien.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Navigasi</h4>
+          <a href="#hero" data-scroll>Beranda</a>
+          <a href="#alur" data-scroll>Alur</a>
+          <a href="#form-janji" data-scroll>Buat Janji</a>
+          <a href="#faq" data-scroll>FAQ</a>
+          <a href="/daftar-janji">Daftar Janji</a>
         </div>
-    </section>
-
-    <footer class="footer" id="kontak">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <div class="footer-logo">
-                    <img src="/logo.png" alt="" class="footer-logo-img">
-                    <span>SMAN 1 BELIMBING</span>
-                </div>
-                <p class="footer-desc">Sistem Pelayanan Publik untuk memudahkan masyarakat dalam berkomunikasi dengan pihak sekolah.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <h4>Navigasi</h4>
-                    <a href="#hero">Beranda</a>
-                    <a href="#alur">Alur</a>
-                    <a href="#faq">FAQ</a>
-                    <a href="/daftar-janji">Daftar Janji</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Layanan</h4>
-                    <a href="#form-janji">Buat Janji</a>
-                    <a href="/daftar-janji">Cek Status</a>
-                    <a href="/admin">Dashboard Admin</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Kontak</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Jl. Pendidikan No. 1, Belimbing</p>
-                    <p><i class="fas fa-phone"></i> (0341) 123456</p>
-                    <p><i class="fas fa-envelope"></i> info@sman1belimbing.sch.id</p>
-                </div>
-            </div>
+        <div class="footer-col">
+          <h4>Layanan</h4>
+          <a href="#form-janji" data-scroll>Buat Janji Temu</a>
+          <a href="/daftar-janji">Cek Status Antrian</a>
+          <a href="/admin">Dashboard Admin</a>
         </div>
-        <div class="footer-bottom">
-            <p>SMAN 1 BELIMBING. Sistem Pelayanan Publik.</p>
+        <div class="footer-col">
+          <h4>Kontak</h4>
+          <p>Jl. Pendidikan, Belimbing<br>Muara Enim, Sumatera Selatan</p>
+          <p>sman1belimbing@sch.id</p>
         </div>
-    </footer>
-    </main>
-
-    <div class="modal-overlay hidden" id="modalOverlay">
-        <div class="modal" id="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Judul</h3>
-                <button class="modal-close" id="modalClose" aria-label="Tutup">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-footer" id="modalFooter"></div>
-        </div>
+      </div>
     </div>
-
-    <div class="toast-container" id="toastContainer"></div>
-
-    <div class="modal-overlay hidden" id="cardModalOverlay">
-        <div class="modal modal-card" id="cardModal">
-            <div class="appointment-card" id="appointmentCard">
-                <div class="card-header">
-                    <div class="card-logo">
-                        <img src="/logo.png" alt="" class="card-logo-img">
-                    </div>
-                    <div class="card-school">
-                        <span class="card-school-name">SMAN 1 BELIMBING</span>
-                        <span class="card-school-sub">Sistem Pelayanan Publik</span>
-                    </div>
-                </div>
-                <div class="card-divider"></div>
-                <div class="card-body">
-                    <div class="card-qr" id="cardQR"></div>
-                    <div class="card-number" id="cardNumber">A-001</div>
-                    <div class="card-status" id="cardStatus">Menunggu Konfirmasi</div>
-                    <div class="card-details">
-                        <div class="card-detail">
-                            <span class="card-label">Nama</span>
-                            <span class="card-value" id="cardNama">-</span>
-                        </div>
-                        <div class="card-detail">
-                            <span class="card-label">Tujuan</span>
-                            <span class="card-value" id="cardTujuan">-</span>
-                        </div>
-                        <div class="card-detail">
-                            <span class="card-label">Tanggal</span>
-                            <span class="card-value" id="cardTanggal">-</span>
-                        </div>
-                        <div class="card-detail">
-                            <span class="card-label">Jam</span>
-                            <span class="card-value" id="cardJam">-</span>
-                        </div>
-                        <div class="card-detail">
-                            <span class="card-label">WhatsApp</span>
-                            <span class="card-value" id="cardWA">-</span>
-                        </div>
-                        <div class="card-detail">
-                            <span class="card-label">Waktu Pengajuan</span>
-                            <span class="card-value" id="cardTimestamp">-</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span>Harap membawa kartu ini saat kunjungan</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-outline" id="btnPrintCard">
-                    <i class="fas fa-print"></i>
-                    <span>Cetak</span>
-                </button>
-                <button class="btn btn-primary" id="btnCopyNumber">
-                    <i class="fas fa-copy"></i>
-                    <span>Salin Nomor</span>
-                </button>
-                <button class="btn btn-outline" id="btnShareCard">
-                    <i class="fas fa-share-alt"></i>
-                    <span>Bagikan</span>
-                </button>
-            </div>
-        </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SMAN 1 BELIMBING. Semua hak dilindungi.</p>
+      <p>Portal Pelayanan Digital v3.0</p>
     </div>
+  </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-    <script src="/intro.js"></script>
-    <script src="/script.js"></script>
+</div><!-- /#site -->
+
+<!-- DIGITAL TICKET OVERLAY -->
+<div class="ticket-overlay" id="ticketOverlay" role="dialog" aria-modal="true" aria-label="Tiket antrian digital">
+  <div class="ticket-wrapper" id="ticketWrapper">
+    <div class="ticket-card" id="ticketCard">
+      <div class="ticket-header" style="position:relative">
+        <button class="ticket-close-btn" id="ticketClose" aria-label="Tutup tiket">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="ticket-logo">
+          <img src="/logo.png" alt="Logo SMAN 1 BELIMBING" width="42" height="42">
+          <div>
+            <div class="ticket-school-name">SMAN 1 BELIMBING</div>
+            <div class="ticket-school-sub">Portal Pelayanan Digital</div>
+          </div>
+        </div>
+        <div class="ticket-num" id="ticketNum">A-001</div>
+        <span class="ticket-status-badge badge-waiting" id="ticketStatusBadge">Menunggu Konfirmasi</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-qr-section">
+          <canvas id="ticketQRCanvas" class="ticket-qr-canvas" width="180" height="180" aria-label="QR Code tiket"></canvas>
+          <p class="ticket-qr-hint">Tunjukkan QR ini saat tiba di sekolah</p>
+        </div>
+        <div class="ticket-details">
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">Nama</span>
+            <span class="ticket-detail-value" id="tNama">-</span>
+          </div>
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">WhatsApp</span>
+            <span class="ticket-detail-value" id="tWA">-</span>
+          </div>
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">Tujuan</span>
+            <span class="ticket-detail-value" id="tTujuan">-</span>
+          </div>
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">Tanggal</span>
+            <span class="ticket-detail-value" id="tTanggal">-</span>
+          </div>
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">Jam</span>
+            <span class="ticket-detail-value" id="tJam">-</span>
+          </div>
+          <div class="ticket-detail">
+            <span class="ticket-detail-label">Diajukan</span>
+            <span class="ticket-detail-value" id="tCreated">-</span>
+          </div>
+          <div class="ticket-detail full">
+            <span class="ticket-detail-label">Keperluan</span>
+            <span class="ticket-detail-value" id="tKeperluan">-</span>
+          </div>
+        </div>
+        <div class="ticket-divider"></div>
+        <p class="ticket-note">Simpan nomor antrian ini. Hadir tepat waktu sesuai jadwal yang telah diajukan.</p>
+      </div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" id="btnPrint" style="flex:1">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Cetak
+        </button>
+        <button class="btn btn-ghost" id="btnCopyNum" style="flex:1">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Salin Nomor
+        </button>
+        <button class="btn btn-primary" id="btnShare" style="flex:1">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Bagikan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">-</h3>
+      <button class="modal-close" id="modalClose" aria-label="Tutup">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<style>
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
+<script src="/script.js" defer></script>
 </body>
 </html>
